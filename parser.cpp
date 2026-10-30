@@ -17,6 +17,9 @@ struct SyntaxTreeNode {
 	vector<SyntaxTreeNode*> children;
 	vector<Token> leaves;
 
+	SyntaxTreeNode() {};
+	SyntaxTreeNode(SyntaxTreeNodeType t) : type(t) {};
+	SyntaxTreeNode(SyntaxTreeNodeType t, vector<SyntaxTreeNode*> c) : type(t), children(c) {};
 	~SyntaxTreeNode() {
 		for (SyntaxTreeNode* child : children) {
 			delete child;
@@ -25,8 +28,6 @@ struct SyntaxTreeNode {
 };
 
 class SyntaxTree {
-	private:
-		SyntaxTreeNode* root;
 	public:
 		SyntaxTree();
 		SyntaxTree(const SyntaxTreeNodeType& t) {
@@ -42,7 +43,7 @@ class SyntaxTree {
 		}
 
 		void insert(const SyntaxTreeNodeType& t) {
-			SyntaxTreeNode node = SyntaxTreeNode(t, {});
+			SyntaxTreeNode node = SyntaxTreeNode(t);
 			insert(&node);
 		}
 
@@ -83,8 +84,10 @@ class SyntaxTree {
 		}
 
 		bool failed() {
-			return empty() && UNINITIALIZED == root->type
+			return empty() && UNINITIALIZED == root->type;
 		}
+	private:
+		SyntaxTreeNode* root;
 };
 
 class Parser {
@@ -160,6 +163,7 @@ class Parser {
 			SyntaxTree* tree = branch();
 			if (tree->failed()) {
 				delete tree;
+				pos = save;
 				return nullptr;
 			}
 			return tree;

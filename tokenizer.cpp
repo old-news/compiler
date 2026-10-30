@@ -45,6 +45,8 @@ class Tokenizer {
 				{"import", IMPORT}, {"from", FROM}, {"as", AS},
 				{"const", CONST}, {"int", INT}, {"float", FLOAT}, {"char", CHAR}, {"str", STRING_TYPE}, {"bool", BOOL},
 				{"return", RETURN}, {"enum", ENUM},
+				{"class", CLASS}, {"private", PRIVATE}, {"protected", PROTECTED}, {"public", PUBLIC},
+				{"childof", CHILDOF}, {"template", TEMPLATE}, {"adheresto", ADHERESTO},
 
 				{"null", NULL_LITERAL}, {"true", TRUE}, {"false", FALSE},
 			};

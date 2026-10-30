@@ -28,6 +28,7 @@ enum TokenType {
 	IMPORT, FROM, AS,
 	CONST, BOOL, INT, STRING_TYPE, CHAR, FLOAT,
 	TRUE, FALSE,
+	CLASS, PRIVATE, PROTECTED, PUBLIC, CHILDOF, TEMPLATE, ADHERESTO,
 
 	// Delimiters
 	OPEN_PARENTHESIS, CLOSE_PARENTHESIS,   // ( )
@@ -113,6 +114,13 @@ string to_string(TokenType type) {
 		case FLOAT: return "FLOAT";
 		case TRUE: return "TRUE";
 		case FALSE: return "FALSE";
+		case CLASS: return "CLASS";
+		case PRIVATE: return "PRIVATE";
+		case PROTECTED: return "PROTECTED";
+		case PUBLIC: return "PUBLIC";
+		case CHILDOF: return "CHILDOF";
+		case TEMPLATE: return "TEMPLATE";
+		case ADHERESTO: return "ADHERESTO";
 
 		// Delimiters
 		case OPEN_PARENTHESIS: return "OPEN_PARENTHESIS";
