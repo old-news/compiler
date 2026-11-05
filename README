@@ -1,0 +1,6 @@
+This is part of my project of designing a computer from the ground up, in which I completely design much of the circuitry and code. This is the step where I create a compiler to compile a custom low-level programming language into a custom assembly language.
+
+> [!NOTE]
+>
+> This project is developed on [Codeberg](https://codeberg.org/oldnews/compiler/)
+> and is mirrored on [GitHub](https://github.com/old-news/compiler)
