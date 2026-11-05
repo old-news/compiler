@@ -1,4 +1,5 @@
 #include "tokenizer.cpp"
+#include "parser.cpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -57,15 +58,18 @@ int main(int argc, char** argv) {
 	string stdlib_code = read_file("stdlib.bv");
 	string input_code = stdlib_code + '\n' + source_code;
 	vector<Token> tokens = Tokenizer(input_code).tokenize();
-	Tree parsed = Parser(tokens).parse();
-	vector<exception> errors = Validator(parsed).validate();
-	if (!errors.empty()) {
-		for (auto error : errors) {
-			cout << "Error: " << error.what() << endl;
-		}
-		return -1;
-	}
-	IR ir = InternalRepresentation(parsed).generate();
+	NodePtr parsed = Parser(tokens).parse();
+	/*
+	 * vector<exception> errors = Validator(parsed).validate();
+	 * if (!errors.empty()) {
+		 * for (auto error : errors) {
+			 * cout << "Error: " << error.what() << endl;
+		 * }
+		 * return -1;
+	 * }
+	 */
+	Semantic sma = SemanticAnalyzer(parsted).analyze();
+	IR ir = InternalRepresentation(sma).generate();
 	IR optimized = Optimizer(ir).optimize();
 	string assembly = Objectifier(optimized).objectify();
 	vector<uint8_t> assembled = Assembler(assembly).assemble();

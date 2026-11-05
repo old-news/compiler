@@ -1,7 +1,8 @@
- #include <vector>
+#include "token.cpp"
+#include "tokenizer_exceptions.cpp"
+
+#include <vector>
 #include <queue>
-#include "token.h"
-#include "tokenizer_exceptions.h"
 
 using namespace std;
 
