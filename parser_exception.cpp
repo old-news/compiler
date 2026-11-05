@@ -1,15 +1,16 @@
+#pragma once
 #include <string>
 
 using namespace std;
 
 enum ParserExceptionType  {
-	SOOK_PAST_INPUT,
+	SOOK_PAST_END,
 	UNEXPECTED_TOKEN, EMPTY_PROGRAM,
 };
 
 string to_string(ParserExceptionType t) {
 	switch (t) {
-		case SOOK_PAST_INPUT: return "SOOK_PAST_INPUT";
+		case SOOK_PAST_END: return "SOOK_PAST_END";
 		case UNEXPECTED_TOKEN: return "UNEXPECTED_TOKEN";
 		case EMPTY_PROGRAM: return "EMPTY_PROGRAM";
 	}

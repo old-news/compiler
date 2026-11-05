@@ -63,6 +63,9 @@ class Tokenizer {
 					break;
 				}
 			}
+			if (NEWLINE == tokens.back().getType()) {
+				tokens.pop_back();
+			}
 			tokens.push_back(Token(END, "", filepos.line+1, 0));
 			return tokens;
 		}

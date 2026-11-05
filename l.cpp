@@ -1,5 +1,8 @@
 #include "tokenizer.cpp"
 #include "token.cpp"
+#include "parser_expression.cpp"
+
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,7 +12,11 @@ using namespace std;
 string read_prog() {
 	fstream ifile("prog");
 	if (!ifile) {
-		return "BROKEN";
+		ifile.close();
+		ifile.open("prog.py");
+		if (!ifile) {
+			return "BROKEN";
+		}
 	}
 	ostringstream ss;
 	ss << ifile.rdbuf();
@@ -23,4 +30,6 @@ int main() {
 	for (Token tok : toks) {
 		cout << tok.toString() << endl;
 	}
+	NodePtr tree = Parser(toks).parse();
+	tree->print();
 }
