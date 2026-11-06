@@ -101,6 +101,7 @@ class Tokenizer {
 					break;
 				case ',': add(COMMA); break;
 				case '.': add(PERIOD); break;
+				case '?': add(QUESTION_MARK); break;
 				case '|':
 					switch (next(1)) {
 						case '|': add(LOGICAL_OR, 2); break;

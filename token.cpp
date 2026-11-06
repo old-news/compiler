@@ -39,6 +39,7 @@ enum TokenType {
 	COMMA,                                 // ,
 	PERIOD,                                // .
 	ARROW,                                 // ->
+	QUESTION_MARK,
 
 	// Logical / comparison operators
 	LOGICAL_OR, LOGICAL_AND,               // || &&
@@ -134,6 +135,7 @@ string to_string(TokenType type) {
 		case COMMA: return "COMMA";
 		case PERIOD: return "PERIOD";
 		case ARROW: return "ARROW";
+		case QUESTION_MARK: return "QUESTION_MARK";
 
 		// Logical / comparison operators
 		case LOGICAL_OR: return "LOGICAL_OR";
@@ -193,7 +195,7 @@ class Token {
 	public:
 		Token() : type(INVALID), value(""), line(0), column(0) {}
 
-		Token(TokenType ty, const string& text = "", size_t ln = 0, size_t col = 0)
+		explicit Token(TokenType ty, const string& text = "", size_t ln = 0, size_t col = 0)
 			: type(ty), value(text), line(ln), column(col) {}
 
 		TokenType getType() const {
@@ -218,5 +220,13 @@ class Token {
 
 		string toString() {
 			return "(" + to_string(type) + ", '" + value + "', [" + std::to_string(line) + ", " + std::to_string(column) + "])";
+		}
+
+		bool isLiteral() {
+			return NULL_LITERAL == type || INT == type || STRING == type || BOOLEAN == type;
+		}
+
+		bool isValid() {
+			return INVALID != type;
 		}
 };

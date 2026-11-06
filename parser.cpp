@@ -16,7 +16,7 @@ enum NodeType {
 	UNINITIALIZED, PROGRAM, COMPOUND_BLOCK, BLOCK, FUNCTION_DEFINITION,
 	LIST,
 	TOKEN,
-	EXPRESSION, E0, E1, E2, E2b, E3, E3b, E3c, E3d, E4, E5, E6, E7, E8, LITERAL
+	EXPRESSION, E0, E1, E2, E2b, E3, E3b, E3c, E3d, E4, E5, E6, E7, E8, LITERAL, TERNARY_OPERATOR
 };
 
 string toString(NodeType type) {
@@ -43,6 +43,7 @@ string toString(NodeType type) {
 		case E7: return "E7";
 		case E8: return "E8";
 		case LITERAL: return "LITERAL";
+		case TERNARY_OPERATOR: return "TERNARY_OPERATOR";
 	}
 	return "UNKNOWN";
 }
@@ -54,10 +55,14 @@ struct Node {
 
 	explicit Node(NodeType t) : type(t) {};
 
-	Node(Token t) : type(TOKEN), token(t) {};
+	explicit Node(Token t) : type(TOKEN), token(t) {};
 
 	void add(unique_ptr<Node> child) {
 		children.push_back(std::move(child));
+	}
+
+	void add(Token tchild) {
+		children.push_back(make_unique<Node>(tchild));
 	}
 
 	void print() {
@@ -94,6 +99,10 @@ class Parser {
 
 		Token curr() {
 			return input[pos];
+		}
+
+		TokenType currtype() {
+			return input[pos].getType();
 		}
 
 		Token peek(size_t n) {
@@ -142,20 +151,27 @@ class Parser {
 		}
 
 		NodePtr parse() {
-			return expression();
+			NodePtr n = expression();
+			match(END);
+			return n;
 		}
 
 		NodePtr expression() {
 			NodePtr n = make_unique<Node>(EXPRESSION);
-			n->add(e0());
-			match(END);
+			NodePtr c = tryParse([this] {return ternary_operator();});
+			if (c) {
+				n->add(std::move(c));
+				return n;
+			} else {
+				n->add(e0());
+			}
 			return n;
 		}
 
 		NodePtr e0() {
 			NodePtr n = make_unique<Node>(E0);
 			n->add(e1());
-			while (LOGICAL_OR == curr().getType()) {
+			while (LOGICAL_OR == currtype()) {
 				NodePtr parent = make_unique<Node>(E0);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(LOGICAL_OR)));
@@ -164,22 +180,11 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e0() {
-			 * NodePtr n = make_unique<Node>(E0);
-			 * n->add(e1());
-			 * while (LOGICAL_OR == curr().getType()) {
-				 * n->add(make_unique<Node>(match(LOGICAL_OR)));
-				 * n->add(e1());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e1() {
 			NodePtr n = make_unique<Node>(E1);
 			n->add(e2());
-			while (LOGICAL_AND == curr().getType()) {
+			while (LOGICAL_AND == currtype()) {
 				NodePtr parent = make_unique<Node>(E1);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(LOGICAL_AND)));
@@ -188,23 +193,12 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e1() {
-			 * NodePtr n = make_unique<Node>(E1);
-			 * n->add(e2());
-			 * while (LOGICAL_AND == curr().getType()) {
-				 * n->add(make_unique<Node>(match(LOGICAL_AND)));
-				 * n->add(e2());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e2() {
 			NodePtr n = make_unique<Node>(E2);
 			n->add(e2b());
 			TokenType type;
-			while (EQUAL_DOUBLE == (type = curr().getType()) || NOT_EQUAL == type) {
+			while (EQUAL_DOUBLE == (type = currtype()) || NOT_EQUAL == type) {
 				NodePtr parent = make_unique<Node>(E2);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(type)));
@@ -213,28 +207,12 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e2() {
-			 * NodePtr n = make_unique<Node>(E2);
-			 * n->add(e2b());
-			 * TokenType type;
-			 * while (EQUAL_DOUBLE == (type = curr().getType()) || NOT_EQUAL == type) {
-				 * if (EQUAL_DOUBLE == type) {
-					 * n->add(make_unique<Node>(match(EQUAL_DOUBLE)));
-				 * } else {
-					 * n->add(make_unique<Node>(match(NOT_EQUAL)));
-				 * }
-				 * n->add(e2b());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e2b() {
 			NodePtr n = make_unique<Node>(E2b);
 			n->add(e3());
 			TokenType type;
-			while (GREATER == (type = curr().getType()) || LESS == type || GREATER_EQUAL == type || LESS_EQUAL == type) {
+			while (GREATER == (type = currtype()) || LESS == type || GREATER_EQUAL == type || LESS_EQUAL == type) {
 				NodePtr parent = make_unique<Node>(E2b);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(type)));
@@ -243,28 +221,11 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e2b() {
-			 * NodePtr n = make_unique<Node>(E2b);
-			 * n->add(e3());
-			 * TokenType type;
-			 * while (GREATER == (type = curr().getType()) || LESS == type || GREATER_EQUAL == type || LESS_EQUAL == type) {
-				 * switch (type) {
-					 * case GREATER: n->add(make_unique<Node>(match(GREATER))); break;
-					 * case GREATER_EQUAL: n->add(make_unique<Node>(match(GREATER_EQUAL))); break;
-					 * case LESS: n->add(make_unique<Node>(match(LESS))); break;
-					 * case LESS_EQUAL: n->add(make_unique<Node>(match(LESS_EQUAL))); break;
-				 * }
-				 * n->add(e3());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e3() {
 			NodePtr n = make_unique<Node>(E3);
 			n->add(e3b());
-			while (BITWISE_OR == curr().getType()) {
+			while (BITWISE_OR == currtype()) {
 				NodePtr parent = make_unique<Node>(E3);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(BITWISE_OR)));
@@ -273,22 +234,11 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e3() {
-			 * NodePtr n = make_unique<Node>(E3);
-			 * n->add(e3b());
-			 * while (BITWISE_OR == curr().getType()) {
-				 * n->add(make_unique<Node>(match(BITWISE_OR)));
-				 * n->add(e3b());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e3b() {
 			NodePtr n = make_unique<Node>(E3b);
 			n->add(e3c());
-			while (BITWISE_XOR == curr().getType()) {
+			while (BITWISE_XOR == currtype()) {
 				NodePtr parent = make_unique<Node>(E3b);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(BITWISE_XOR)));
@@ -297,22 +247,11 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e3b() {
-			 * NodePtr n = make_unique<Node>(E3b);
-			 * n->add(e3c());
-			 * while (BITWISE_XOR == curr().getType()) {
-				 * n->add(make_unique<Node>(match(BITWISE_XOR)));
-				 * n->add(e3c());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e3c() {
 			NodePtr n = make_unique<Node>(E3c);
 			n->add(e3d());
-			while (BITWISE_AND == curr().getType()) {
+			while (BITWISE_AND == currtype()) {
 				NodePtr parent = make_unique<Node>(E3c);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(BITWISE_AND)));
@@ -321,23 +260,12 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e3c() {
-			 * NodePtr n = make_unique<Node>(E3c);
-			 * n->add(e3d());
-			 * while (BITWISE_AND == curr().getType()) {
-				 * n->add(make_unique<Node>(match(BITWISE_AND)));
-				 * n->add(e3d());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e3d() {
 			NodePtr n = make_unique<Node>(E3d);
 			n->add(e4());
 			TokenType type;
-			while (SHIFT_RIGHT == (type = curr().getType()) || SHIFT_LEFT == type) {
+			while (SHIFT_RIGHT == (type = currtype()) || SHIFT_LEFT == type) {
 				NodePtr parent = make_unique<Node>(E3d);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(type)));
@@ -346,28 +274,12 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e3d() {
-			 * NodePtr n = make_unique<Node>(E3d);
-			 * n->add(e4());
-			 * TokenType type;
-			 * while (SHIFT_RIGHT == (type = curr().getType()) || SHIFT_LEFT == type) {
-				 * if (SHIFT_RIGHT == type) {
-					 * n->add(make_unique<Node>(match(SHIFT_RIGHT)));
-				 * } else {
-					 * n->add(make_unique<Node>(match(SHIFT_LEFT)));
-				 * }
-				 * n->add(e4());
-			 * }
-			 * return n;
-		 * }
-		 */
 		
 		NodePtr e4() {
 			NodePtr n = make_unique<Node>(E4);
 			n->add(e5());
 			TokenType type;
-			while (PLUS == (type = curr().getType()) || MINUS == type) {
+			while (PLUS == (type = currtype()) || MINUS == type) {
 				NodePtr parent = make_unique<Node>(E4);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(type)));
@@ -381,7 +293,7 @@ class Parser {
 			NodePtr n = make_unique<Node>(E5);
 			n->add(e6());
 			TokenType type;
-			while (STAR == (type = curr().getType()) || SLASH == type || MODULO == type) {
+			while (STAR == (type = currtype()) || SLASH == type || MODULO == type) {
 				NodePtr parent = make_unique<Node>(E5);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(type)));
@@ -390,28 +302,12 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e5() {
-			 * NodePtr n = make_unique<Node>(E5);
-			 * n->add(e6());
-			 * TokenType type;
-			 * while (STAR == (type = curr().getType()) || SLASH == type || MODULO == type) {
-				 * switch (type) {
-					 * case STAR: n->add(make_unique<Node>(match(STAR))); break;
-					 * case SLASH: n->add(make_unique<Node>(match(SLASH))); break;
-					 * case MODULO: n->add(make_unique<Node>(match(MODULO))); break;
-				 * }
-				 * n->add(e6());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e6() {
 			NodePtr n = make_unique<Node>(E6);
 			n->add(e7());
 			TokenType type;
-			while (LOGICAL_NOT == (type = curr().getType()) || MINUS == type || BITWISE_NOT == type) {
+			while (LOGICAL_NOT == (type = currtype()) || MINUS == type || BITWISE_NOT == type) {
 				NodePtr parent = make_unique<Node>(E6);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(type)));
@@ -420,26 +316,11 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e6() {
-			 * NodePtr n = make_unique<Node>(E6);
-			 * TokenType type;
-			 * if (LOGICAL_NOT == (type = curr().getType()) || MINUS == type || BITWISE_NOT == type) {
-				 * switch (type) {
-					 * case LOGICAL_NOT: n->add(make_unique<Node>(match(LOGICAL_NOT))); break;
-					 * case MINUS: n->add(make_unique<Node>(match(MINUS))); break;
-					 * case BITWISE_NOT: n->add(make_unique<Node>(match(BITWISE_NOT))); break;
-				 * }
-			 * }
-			 * n->add(e7());
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e7() {
 			NodePtr n = make_unique<Node>(E7);
 			n->add(e8());
-			while (POWER == curr().getType()) {
+			while (POWER == currtype()) {
 				NodePtr parent = make_unique<Node>(E7);
 				parent->add(std::move(n));
 				parent->add(make_unique<Node>(match(POWER)));
@@ -448,44 +329,32 @@ class Parser {
 			}
 			return n;
 		}
-		/*
-		 * NodePtr e7() {
-			 * NodePtr n = make_unique<Node>(E7);
-			 * n->add(e8());
-			 * while (POWER == curr().getType()) {
-				 * n->add(make_unique<Node>(match(POWER)));
-				 * n->add(e6());
-			 * }
-			 * return n;
-		 * }
-		 */
 
 		NodePtr e8() {
 			NodePtr n = make_unique<Node>(E8);
 			n->add(literal());
 			return n;
-			/*
-			 * TokenType type;
-			 * while (STAR == (type = curr().getType()) || SLASH == type || MODULO == type) {
-				 * switch (type) {
-					 * case STAR: n->add(make_unique<Node>(match(STAR))); break;
-					 * case SLASH: n->add(make_unique<Node>(match(SLASH))); break;
-					 * case MODULO: n->add(make_unique<Node>(match(MODULO))); break;
-				 * }
-				 * n->add(e6());
-			 * }
-			 * return n;
-			 */
 		}
 
 		NodePtr literal() {
 			NodePtr n = make_unique<Node>(LITERAL);
-			switch (curr().getType()) {
+			switch (currtype()) {
 				case NULL_LITERAL: n->add(make_unique<Node>(match(NULL_LITERAL))); break;
 				case NUMBER: n->add(make_unique<Node>(match(NUMBER))); break;
 				case STRING: n->add(make_unique<Node>(match(STRING))); break;
 				case BOOLEAN: n->add(make_unique<Node>(match(BOOLEAN))); break;
+				default: throw ParserException(UNEXPECTED_TOKEN, "Expected literal value");
 			}
+			return n;
+		}
+
+		NodePtr ternary_operator() {
+			NodePtr n = make_unique<Node>(TERNARY_OPERATOR);
+			n->add(e0());
+			n->add(match(QUESTION_MARK));
+			n->add(expression());
+			n->add(match(COLON));
+			n->add(expression());
 			return n;
 		}
 };
