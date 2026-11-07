@@ -21,6 +21,8 @@ class Parser {
 		void advance();
 		NodePtr tryParse(function<NodePtr()>);
 		NodePtr tryParseStar(function<NodePtr()>);
+		NodePtr list(function<NodePtr()>, TokenType);
+		NodePtr list(function<Token()>, TokenType);
 		void enter_scope();
 		void exit_scope();
 		NodePtr type();
@@ -30,6 +32,7 @@ class Parser {
 		NodePtr block();
 
 		NodePtr expression();
+		NodePtr ternary_operator();
 		NodePtr e0();
 		NodePtr e1();
 		NodePtr e2();
@@ -44,14 +47,25 @@ class Parser {
 		NodePtr e7();
 		NodePtr e8();
 		NodePtr literal();
-		NodePtr ternary_operator();
+		NodePtr vvalue();
+		NodePtr v1();
+		NodePtr v2();
+		NodePtr v3();
+		NodePtr array_expression();
+		NodePtr function_call();
 
 		NodePtr function_definition();
-		NodePtr function_def_arg_list();
-		NodePtr function_def_arg();
+		NodePtr type_name_pair();
 
 		NodePtr enum_definition();
-		NodePtr id_list();
+
+		NodePtr import_line();
+		NodePtr id_chain();
+
+		NodePtr error_block();
+		NodePtr try_block();
+		NodePtr except_block();
+		NodePtr finally_block();
 	public:
 		Parser(const vector<Token>& i);
 		NodePtr parse();

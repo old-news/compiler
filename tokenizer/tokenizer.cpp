@@ -1,11 +1,7 @@
 #include "token.cpp"
 #include "tokenizer_exceptions.cpp"
-#include "../utils.h"
 
-#include <iostream>
 #include <cstddef>
-#include <exception>
-#include <stdexcept>
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
@@ -102,6 +98,7 @@ class Tokenizer {
 				case ',': add(COMMA); break;
 				case '.': add(PERIOD); break;
 				case '?': add(QUESTION_MARK); break;
+				case '@': add(AT_SYMBOL); break;
 				case '|':
 					switch (next(1)) {
 						case '|': add(LOGICAL_OR, 2); break;

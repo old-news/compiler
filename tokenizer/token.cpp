@@ -42,6 +42,7 @@ enum TokenType {
 	PERIOD,                                // .
 	ARROW,                                 // ->
 	QUESTION_MARK,
+	AT_SYMBOL,					// @
 
 	// Logical / comparison operators
 	LOGICAL_OR, LOGICAL_AND,               // || &&
@@ -138,6 +139,7 @@ string to_string(TokenType type) {
 		case PERIOD: return "PERIOD";
 		case ARROW: return "ARROW";
 		case QUESTION_MARK: return "QUESTION_MARK";
+		case AT_SYMBOL: return "AT_SYMBOL";
 
 		// Logical / comparison operators
 		case LOGICAL_OR: return "LOGICAL_OR";

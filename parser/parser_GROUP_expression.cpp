@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <memory>
 
 NodePtr Parser::expression() {
 	NodePtr n = make_unique<Node>(EXPRESSION);
@@ -9,6 +10,16 @@ NodePtr Parser::expression() {
 	} else {
 		n->add(Parser::e0());
 	}
+	return n;
+}
+
+NodePtr Parser::ternary_operator() {
+	NodePtr n = make_unique<Node>(TERNARY_OPERATOR);
+	n->add(e0());
+	n->add(match(QUESTION_MARK));
+	n->add(expression());
+	n->add(match(COLON));
+	n->add(expression());
 	return n;
 }
 
@@ -192,12 +203,79 @@ NodePtr Parser::literal() {
 	return n;
 }
 
-NodePtr Parser::ternary_operator() {
-	NodePtr n = make_unique<Node>(TERNARY_OPERATOR);
-	n->add(e0());
-	n->add(match(QUESTION_MARK));
-	n->add(expression());
-	n->add(match(COLON));
-	n->add(expression());
+NodePtr Parser::vvalue() {
+	NodePtr n = make_unique<Node>(VVALUE);
+	TokenType type;
+	if (STAR == (type = currtype()) || AT_SYMBOL == type) {
+		n->add(match(type));
+	}
+	n->add(v1());
+	return n;
+}
+
+NodePtr Parser::v1() {
+	NodePtr n = make_unique<Node>(V1);
+	TokenType t;
+	n->add(v2());
+	while (PERIOD == (t = currtype()) || ARROW == t) {
+		NodePtr parent = make_unique<Node>(V1);
+		parent->add(std::move(n));
+		parent->add(make_unique<Node>(match(t)));
+		parent->add(v2());
+		n = std::move(parent);
+	}
+	return n;
+}
+
+NodePtr Parser::v2() {
+	NodePtr n = make_unique<Node>(V2);
+	n->add(v3());
+	while (OPEN_BRACKET == currtype()) {
+		NodePtr parent = make_unique<Node>(V2);
+		parent->add(std::move(n));
+		match(OPEN_BRACKET);
+		parent->add(ARRAY_INDEXING, expression());
+		match(CLOSE_BRACKET);
+		n = std::move(parent);
+	}
+	return n;
+}
+
+NodePtr Parser::v3() {
+	NodePtr n = make_unique<Node>(V3);
+	switch (currtype()) {
+		case OPEN_PARENTHESIS:
+			match(OPEN_PARENTHESIS);
+			n->add(expression());
+			match(CLOSE_PARENTHESIS);
+			break;
+		case OPEN_BRACKET:
+			n->add(array_expression());
+			break;
+		default:
+			if (OPEN_PARENTHESIS == peek(1).getType()) {
+				n->add(function_call());
+			} else {
+				n->add(match(ID));
+			}
+	}
+	return n;
+}
+
+NodePtr Parser::array_expression() {
+	match(OPEN_BRACKET);
+	NodePtr n = make_unique<Node>(ARRAY_EXPRESSION, list([this] {return expression();}, COMMA));
+	match(CLOSE_BRACKET);
+	return n;
+}
+
+NodePtr Parser::function_call() {
+	NodePtr n = make_unique<Node>(FUNCTION_CALL);
+	n->add(NAME, match(ID));
+	match(OPEN_PARENTHESIS);
+	if (CLOSE_PARENTHESIS != currtype()) {
+		n->add(ARGS, list([this] {return expression();}, COMMA));
+	}
+	match(CLOSE_PARENTHESIS);
 	return n;
 }

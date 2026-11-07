@@ -65,6 +65,16 @@ NodePtr Parser::tryParseStar(function<NodePtr()> branch) {
 	return list;
 }
 
+NodePtr Parser::list(function<NodePtr()> variable, TokenType delim) {
+	NodePtr n = make_unique<Node>(LIST);
+	n->add(variable());
+	while (delim == currtype()) {
+		match(delim);
+		n->add(variable());
+	}
+	return n;
+}
+
 NodePtr Parser::parse() {
 	return Parser::program();
 }

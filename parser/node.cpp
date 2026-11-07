@@ -10,9 +10,16 @@ enum NodeType {
 	UNINITIALIZED, PROGRAM, COMPOUND_BLOCK, BLOCK, TYPE,
 	LIST, NAME,
 	TOKEN,
-	EXPRESSION, E0, E1, E2, E2b, E3, E3b, E3c, E3d, E4, E5, E6, E7, E8, LITERAL, TERNARY_OPERATOR,
-	FUNCTION_DEFINITION, FUNCTION_DEF_ARG_LIST, FUNCTION_DEF_ARG,
+	EXPRESSION,
+		E0, E1, E2, E2b, E3, E3b, E3c, E3d, E4, E5, E6, E7, E8, LITERAL, TERNARY_OPERATOR,
+		VVALUE, V1, V2, V3, VUNIT, ARRAY_INDEXING, ARRAY_EXPRESSION, FUNCTION_CALL,
+	FUNCTION_DEFINITION,
+		ARGS, TYPE_NAME_PAIR,
 	ENUM_DEFINITION,
+	IMPORT_LINE,
+		IMPORTEE, LOCATION,
+	ERROR_BLOCK,
+		TRY_BLOCK, EXCEPT_BLOCK, FINALLY_BLOCK,
 };
 
 string toString(NodeType type) {
@@ -52,13 +59,23 @@ struct Node {
 	explicit Node(NodeType t) : type(t) {};
 	explicit Node(Token t) : type(TOKEN), token(t) {};
 	explicit Node(NodeType type, Token tok) : type(type), token(tok) {};
+	explicit Node(NodeType type, unique_ptr<Node> uniq) : type(type), children(uniq->children) {};
 
 	void add(unique_ptr<Node> child) {
 		children.push_back(std::move(child));
 	}
 
+	void add(NodeType ntype, unique_ptr<Node> child) {
+		child->type = ntype;
+		children.push_back(std::move(child));
+	}
+
 	void add(Token tchild) {
-		children.push_back(make_unique<Node>(tchild));
+		add(make_unique<Node>(tchild));
+	}
+
+	void add(NodeType ntype, Token tchild) {
+		add(make_unique<Node>(ntype, tchild));
 	}
 
 	void print() {

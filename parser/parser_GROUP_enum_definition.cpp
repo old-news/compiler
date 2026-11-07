@@ -6,17 +6,7 @@ NodePtr Parser::enum_definition() {
 	match(ENUM);
 	n->add(make_unique<Node>(NAME, match(ID)));
 	enter_scope();
-	n->add(id_list());
+	n->add(list([this] {return make_unique<Node>(match(ID));}, COMMA));
 	exit_scope();
-	return n;
-}
-
-NodePtr Parser::id_list() {
-	NodePtr n = make_unique<Node>(LIST);
-	n->add(match(ID));
-	while (COMMA == currtype()) {
-		match(COMMA);
-		n->add(match(ID));
-	}
 	return n;
 }
