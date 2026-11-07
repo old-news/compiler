@@ -1,5 +1,5 @@
 #include "tokenizer.cpp"
-#include "parser.cpp"
+#include "parser/parser.cpp"
 
 #include <iostream>
 #include <stdexcept>
