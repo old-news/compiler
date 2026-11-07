@@ -99,6 +99,7 @@ class Tokenizer {
 				case '.': add(PERIOD); break;
 				case '?': add(QUESTION_MARK); break;
 				case '@': add(AT_SYMBOL); break;
+				case '$': add(MONEY_SIGN); break;
 				case '|':
 					switch (next(1)) {
 						case '|': add(LOGICAL_OR, 2); break;

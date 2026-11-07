@@ -42,7 +42,8 @@ enum TokenType {
 	PERIOD,                                // .
 	ARROW,                                 // ->
 	QUESTION_MARK,
-	AT_SYMBOL,					// @
+	AT_SYMBOL,				// @
+	MONEY_SIGN,				// $
 
 	// Logical / comparison operators
 	LOGICAL_OR, LOGICAL_AND,               // || &&
@@ -140,6 +141,7 @@ string to_string(TokenType type) {
 		case ARROW: return "ARROW";
 		case QUESTION_MARK: return "QUESTION_MARK";
 		case AT_SYMBOL: return "AT_SYMBOL";
+		case MONEY_SIGN: return "MONEY_SIGN";
 
 		// Logical / comparison operators
 		case LOGICAL_OR: return "LOGICAL_OR";
@@ -215,6 +217,10 @@ class Token {
 
 		size_t getColumn() const {
 			return pos.col;
+		}
+
+		Pos getPos() const {
+			return pos;
 		}
 
 		bool is(TokenType ty) const {
