@@ -20,16 +20,20 @@ bool Parser::empty() {
 	return pos >= input.size();
 }
 
+Pos Parser::getpos() {
+	return curr().getPos();
+}
+
 Token Parser::match(TokenType type) {
 	if (empty()) {
-		throw ParserException(SOOK_PAST_END, "Matched beyond input end");
+		throw ParserException(SOOK_PAST_END, "Matched beyond input end", getpos());
 	}
 	Token c = curr();
 	if (type == c.getType()) {
 		advance();
 		return c;
 	}
-	throw ParserException(UNEXPECTED_TOKEN, "Failed token match at " + to_string(pos));
+	throw ParserException(UNEXPECTED_TOKEN, "Failed token match", getpos());
 }
 
 Token Parser::tryMatch(TokenType type) {
@@ -87,6 +91,10 @@ void Parser::enter_scope() {
 
 void Parser::exit_scope() {
 	match(DEDENT);
+}
+
+void Parser::loc_end() {
+	match(NEWLINE);
 }
 
 NodePtr Parser::type() {

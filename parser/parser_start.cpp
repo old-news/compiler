@@ -33,7 +33,7 @@ NodePtr Parser::block() {
 			n->add(import_line());
 			break;
 		case TRY:
-			n->add(error_handling());
+			n->add(error_block());
 			break;
 		default:
 			NodePtr c = tryParse([this] {return loc();});

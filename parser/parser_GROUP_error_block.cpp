@@ -20,7 +20,7 @@ NodePtr Parser::try_block() {
 NodePtr Parser::except_block() {
 	NodePtr n = make_unique<Node>(EXCEPT_BLOCK);
 	n->add(type_name_pair());
-	n->add(compound_block());
+	n->add(BODY, compound_block());
 	return n;
 }
 

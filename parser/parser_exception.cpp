@@ -1,4 +1,7 @@
 #pragma once
+
+#include "../utils.h"
+
 #include <string>
 
 using namespace std;
@@ -21,17 +24,23 @@ class ParserException : public exception {
 	private:
 		ParserExceptionType  type;
 		string message;
+		Pos pos;
+		string what_message;
 	public:
-		ParserException (const string& msg) : message(msg) {};
-		ParserException (const ParserExceptionType & ntype) : type(ntype) {};
-		ParserException (const ParserExceptionType & ntype, const string& msg) : type(ntype), message(msg) {};
+		ParserException (const string& msg, const Pos& p) : message(msg), pos(p) {buildWhatMessage();};
+		ParserException (const ParserExceptionType& ntype, const Pos& p) : type(ntype), pos(p) {buildWhatMessage();};
+		ParserException (const ParserExceptionType& ntype, const string& msg, const Pos& p) : type(ntype), message(msg), pos(p) {buildWhatMessage();};
 
 		string getMessage() const { return message; }
 		ParserExceptionType getType() const { return type; }
 		string toString() const {
-			return "Tokenizer Exception (" + to_string(type) + "): " + message;
+			return "Tokenizer Exception (" + to_string(type) + "): " + what_message;
 		}
 		const char* what() const noexcept override {
-			return message.c_str();
+			return what_message.c_str();
+		}
+
+		const void buildWhatMessage() {
+			what_message = message + " at " + pos.toString();
 		}
 };

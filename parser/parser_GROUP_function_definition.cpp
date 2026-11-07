@@ -3,7 +3,11 @@
 
 NodePtr Parser::function_definition() {
 	NodePtr n = make_unique<Node>(FUNCTION_DEFINITION);
-	n->add(type());
+	if (OPEN_PARENTHESIS == peek(1).getType()) {
+		n->add(TYPE, Token(INVALID));
+	} else {
+		n->add(type());
+	}
 	n->add(NAME, match(ID));
 	match(OPEN_PARENTHESIS);
 	n->add(
@@ -12,7 +16,7 @@ NodePtr Parser::function_definition() {
 	);
 	match(CLOSE_PARENTHESIS);
 	enter_scope();
-	n->add(compound_block());
+	n->add(BODY, compound_block());
 	exit_scope();
 	return n;
 }

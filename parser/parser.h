@@ -11,11 +11,13 @@ class Parser {
 	private:
 		vector<Token> input;
 		size_t pos;
+		Pos filepos;
 
 		Token curr();
 		TokenType currtype();
 		Token peek(size_t);
 		bool empty();
+		Pos getpos();
 		Token match(TokenType);
 		Token tryMatch(TokenType);
 		void advance();
@@ -25,6 +27,7 @@ class Parser {
 		NodePtr list(function<Token()>, TokenType);
 		void enter_scope();
 		void exit_scope();
+		void loc_end();
 		NodePtr type();
 
 		NodePtr program();
@@ -66,6 +69,14 @@ class Parser {
 		NodePtr try_block();
 		NodePtr except_block();
 		NodePtr finally_block();
+
+		NodePtr class_definition();
+		NodePtr class_def_body();
+		NodePtr class_func_section();
+		NodePtr class_function();
+		NodePtr class_access_level();
+		NodePtr class_var_section();
+		NodePtr class_var_group();
 	public:
 		Parser(const vector<Token>& i);
 		NodePtr parse();

@@ -198,7 +198,7 @@ NodePtr Parser::literal() {
 		case NUMBER: n->add(make_unique<Node>(match(NUMBER))); break;
 		case STRING: n->add(make_unique<Node>(match(STRING))); break;
 		case BOOLEAN: n->add(make_unique<Node>(match(BOOLEAN))); break;
-		default: throw ParserException(UNEXPECTED_TOKEN, "Expected literal value");
+		default: throw ParserException(UNEXPECTED_TOKEN, "Expected literal value", getpos());
 	}
 	return n;
 }
