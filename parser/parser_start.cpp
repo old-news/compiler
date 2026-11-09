@@ -24,7 +24,7 @@ NodePtr Parser::block() {
 			n->add(control_flow());
 			break;
 		case CLASS:
-			n->add(class_definitionn());
+			n->add(class_definition());
 			break;
 		case ENUM:
 			n->add(enum_definition());
