@@ -26,7 +26,7 @@ NodePtr Parser::for_block() {
 
 NodePtr Parser::for_inner() {
 	NodePtr n = make_unique<Node>(FOR_INNER);
-	n->add(var_assignment());
+	n->add(var_declaration());
 	Token t = tryMatch(TO);
 	if (t.is(INVALID)) {
 		n->add(match(IN));
