@@ -206,10 +206,13 @@ NodePtr Parser::literal() {
 NodePtr Parser::vvalue() {
 	NodePtr n = make_unique<Node>(VVALUE);
 	TokenType type;
-	if (STAR == (type = currtype()) || AT_SYMBOL == type) {
+	while (MONEY_SIGN == (type = currtype()) || AT_SYMBOL == type) {
 		n->add(match(type));
 	}
 	n->add(v1());
+	while (MONEY_SIGN == (type = currtype()) || AT_SYMBOL == type) {
+		n->add(match(type));
+	}
 	return n;
 }
 

@@ -29,23 +29,8 @@ NodePtr Parser::class_def_body() {
 }
 
 NodePtr Parser::class_func_section() {
-	NodePtr n = make_unique<Node>(CLASS_FUNC_SECTION);
-	n->add(class_function());
-	NodePtr c;
-	while ((c = tryParse([this] {return class_function();}))) {
-		n->add(std::move(c));
-	}
-	return n;
-}
-
-NodePtr Parser::class_function() {
-	NodePtr n = make_unique<Node>(CLASS_FUNCTION);
-	n->add(class_access_level());
-	TokenType t = currtype();
-	if (MONEY_SIGN == currtype()) {
-		n->add(DESTRUCTOR, match(MONEY_SIGN));
-	}
-	n->add(function_definition());
+	NodePtr n = list([this] {return function_definition(true);});
+	n->type = CLASS_FUNC_SECTION;
 	return n;
 }
 
@@ -59,18 +44,10 @@ NodePtr Parser::class_access_level() {
 
 NodePtr Parser::class_var_section() {
 	NodePtr n = make_unique<Node>(CLASS_VAR_SECTION);
+	n->add(var_decl(true));
 	NodePtr c;
-	while ((c = tryParse([this] {return class_var_group();}))) {
+	while ((c = tryParse([this] {return var_decl(true);}))) {
 		n->add(std::move(c));
 	}
-	return n;
-}
-
-NodePtr Parser::class_var_group() {
-	NodePtr n = make_unique<Node>(CLASS_VAR_GROUP);
-	n->add(class_access_level());
-	n->add(type());
-	n->add(list([this] {return make_unique<Node>(match(ID));}, COMMA));
-	loc_end();
 	return n;
 }

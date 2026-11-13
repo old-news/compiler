@@ -24,6 +24,7 @@ class Parser {
 		void retreat();
 		NodePtr tryParse(function<NodePtr()>);
 		NodePtr tryParseStar(function<NodePtr()>);
+		NodePtr list(function<NodePtr()>);
 		NodePtr list(function<NodePtr()>, TokenType);
 		NodePtr list(function<Token()>, TokenType);
 		void enter_scope();
@@ -59,7 +60,8 @@ class Parser {
 		NodePtr function_call();
 
 		NodePtr function_definition();
-		NodePtr type_name_pair();
+		NodePtr function_definition(bool);
+		NodePtr var_ldecl();
 
 		NodePtr enum_definition();
 
@@ -74,10 +76,8 @@ class Parser {
 		NodePtr class_definition();
 		NodePtr class_def_body();
 		NodePtr class_func_section();
-		NodePtr class_function();
 		NodePtr class_access_level();
 		NodePtr class_var_section();
-		NodePtr class_var_group();
 
 		NodePtr control_flow();
 		NodePtr while_block();

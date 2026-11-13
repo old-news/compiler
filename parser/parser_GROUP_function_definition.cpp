@@ -2,27 +2,33 @@
 #include <memory>
 
 NodePtr Parser::function_definition() {
+	return function_definition(false);
+}
+
+NodePtr Parser::function_definition(bool is_class_function) {
 	NodePtr n = make_unique<Node>(FUNCTION_DEFINITION);
-	if (OPEN_PARENTHESIS == peek(1).getType()) {
-		n->add(TYPE, Token(INVALID));
-	} else {
-		n->add(type());
-	}
 	n->add(NAME, match(ID));
 	match(OPEN_PARENTHESIS);
 	n->add(
 		ARGS,
-		list([this] {return type_name_pair();}, COMMA)
+		list([this] {return var_ldecl();}, COMMA)
 	);
 	match(CLOSE_PARENTHESIS);
+	match(COLON);
+	if (is_class_function) {
+		n->add(class_access_level());
+	}
+	n->add(type());
 	enter_scope();
 	n->add(BODY, compound_block());
 	exit_scope();
 	return n;
 }
 
-NodePtr Parser::type_name_pair() {
-	NodePtr n = make_unique<Node>(TYPE_NAME_PAIR);
+NodePtr Parser::var_ldecl() {
+	NodePtr n = make_unique<Node>(VAR_LDECL);
+	n->add(NAME, match(ID));
+	match(COLON);
 	n->add(type());
-	n->add(match(ID));
+	return n;
 }
