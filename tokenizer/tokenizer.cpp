@@ -35,7 +35,7 @@ class Tokenizer {
 			keywords = {
 				{"if", IF}, {"elif", ELIF}, {"else", ELSE},
 				{"switch", SWITCH}, {"case", CASE}, {"default", DEFAULT},
-				{"for", FOR}, {"while", WHILE},
+				{"for", FOR}, {"to", TO}, {"in", IN}, {"while", WHILE},
 				{"break", BREAK}, {"continue", CONTINUE},
 				{"throw", THROW}, {"try", TRY}, {"except", EXCEPT}, {"finally", FINALLY},
 				{"import", IMPORT}, {"from", FROM}, {"as", AS},

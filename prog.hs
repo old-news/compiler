@@ -135,63 +135,134 @@ int sqad(int a, int b) {
 }
 
 generictype Number {
+	float, double,
+	Integer
+}
+
+generictype Integer {
 	short, int,
 	i8, i16, i24, i32, i48, i64, i128,
-	float, double
+}
+
+generictype uint {
+	ui8, ui16, ui24, ui32, ui48, ui64, ui128
+}
+
+interface Iterator<typename T> {
+	begin() -> @T
+	end() -> @T
+	next() -> @T
+
+	copyto(it: Iterator<T>) {
+		v: @T = next()
+		to: @T = it.next()
+		while (v != end()) {
+			if (to == it.end()) {
+				exception(this, "Failed copy of Iterator to Iterator")
+			}
+			to@ = v@
+			v = next()
+			to = it.next()
+		}
+	}
 }
 
 interface Iterable<typename T> {
-	begin() -> @T
-	end() -> @T
+	iter() -> Iterator<T>
 }
 
-interface Collection<typename T> impl Iterable {
-	begin() -> @T
-	end() -> @T
-	size() -> Number
+interface Collection<typename T, onetype<@T, uint> K> impl Iterable<T> {
+	size() -> uint
 	push(T)
+	pop(K)
+	begin() -> @T
+
+	copyto(newloc: Iterable<T>) {
+		iter().copyto(newloc.iter())
+	}
+
+	operator::dealloc() {
+		for (item: @T in this) {
+			dealloc item@
+		}
+	}
 }
 
-class vector<typename T> impl Collection {
+interface List<typename T> impl Collection<T> {
+	pop(uint)
+	empty() -> bool
+}
+
+class contiguous_iterator<typename T> impl Iterator {
+	// Iterates over a contiguous block of memory
+	private:
+		start, finish: @T
+		index: uint
+	public:
+		iterator(s, e: @T) {
+			start = s
+			finish = e
+			index = 0
+		}
+
+		size() -> uint {
+			return end() - begin()
+		}
+
+		begin() -> @T {
+			return start
+		}
+
+		end() -> @T {
+			return finish
+		}
+
+		next() -> @T {
+			index++
+			return begin() + index - 1
+		}
+}
+
+class vector<typename T> impl Collection<T> {
 	private:
 		loc: @T
-		len, allocated_len: i48
+		len, allocated_len: ui48
 
 		grow() {
 			grow(4)
 		}
 
-		grow(newsize: Number) {
-			new_alloc_len: int = max(size * 1.5, newsize)
+		grow(newsize: uint) {
+			new_alloc_len: int = max(size() * 1.5, newsize)
 			newloc: @T = alloc(heap, sizeof(T) * new_alloc_len)
-			this.copy(newloc)
+			copyto(newloc)
 			allocated_len = new_alloc_len
 			dealloc loc
 			loc = newloc
 		}
 	public:
 		vector() {
-			vector(0)
+			this(0)
 		}
 
-		vector(start_space: size_t) {
-			start_space.min(2)
+		vector(start_space: uint) {
+			start_space = start_space.min(2)
 			loc = alloc(heap, sizeof(T) * start_space)
 			len = 0
 			allocated_len = start_space
 		}
 
-		vector(col: Collection) {
-			vector(col.size())
-			concat(col);
+		vector(col: Collection<T>) {
+			this(col.size())
+			concat(col)
 		}
 
-		vector(it: Iterable) {
-			vector()
-			concat(it);
+		vector(it: Iterable<T>) {
+			this()
+			concat(it)
 		}
 
-		push(item: T) {
+		push(item: T) start_space = {
 			if (len >= allocated_len) {
 				grow()
 			}
@@ -199,66 +270,104 @@ class vector<typename T> impl Collection {
 			len++
 		}
 
-		pop(index: Number) {
-			if (index >= size())
-				fail()
+		pop(index: Integer) {
+			if (index < 0 || index >= size())
+				exception(this, "Attempted pop at %d, which is not in bounds of vector with length %d".format(index, size()))
 			if (index == size() - 1) {
 				return pop()
 			}
-			newloc: @T = alloc(heap, sizeof(T) * allocated_len)
-			if (index > 0)
-				copy(begin(), begin() + index - 1, newloc)
-			copy(begin() + index + 1, end(), newloc + index);
-			dealloc loc
-			loc = newloc
+			iterator(begin() + index + 1, end()).copyto(begin() + index)
 		}
 
 		pop() {
 			if (0 == size())
-				fail()
+				exception(this, "Attempted pop when empty")
 			len--
 		}
 
-		concat(col: Collection) {
-			newlen: Number = size() + col.size()
+		concat(col: Collection<T>) {
+			newlen := size() + col.size()
 			if (newlen > allocated_len) {
 				grow(newlen)
 			}
-			col.copyto(begin() + size())
+			col.copyto(loc + size())
 			len = newlen
 		}
 
-		begin() -> @T {
-			return loc;
+		concat(it: Iterable<T>) {
+			for (item: @T in it) {
+				push(item@)
+			}
 		}
 
-		end() -> @T {
-			return loc + len;
+		iter() -> Iterator<T> {
+			return contiguous_iterator(loc, loc + len)
 		}
 
 		size() -> size_t {
 			return len;
 		}
 
-		at(i: Number) -> T {
+		at(i: Integer) -> T {
 			if (i < 0 || i >= size())
-				fail()
+				exception(this, "Attempted lookup at %, which is out of bounds of vector with length %".format(i, size()))
 			return this[i]
 		}
 
-		operator::[] (i: Number) -> T {
+		operator::[] (i: Integer) -> T {
 			return loc[i]
+		}
+
+		operator::= (Collection<T> c) {
+			if (c.begin() == begin()) return
+			dealloc this
+			this(c)
+		}
+
+		operator::dealloc() {
+			Collection::dealloc(this)
+			dealloc loc
+		}
+
+		empty() -> bool {
+			return 0 == size()
 		}
 }
 
-Collection<T>::copyto(newloc: @T) {
-	for (t in this) {
-		newloc@ = t
-		newloc++
-	}
+class string extends vector<char> {
+	public:
+		format<arglist(N, args)>(args) {
+			if (empty()) return this
+			string out;
+			for (i := 0 to size()) {
+				c: char = this[i]
+				if ('%' != c) {
+					out.push(c)
+				} else if (i + 1 == size() || '%' == this[i + 1]) {
+					out.push(args[N].tostring())
+					n++
+				} else {
+					out.push('%')
+					i++
+				}
+			}
+		}
 }
 
 a: int[4] = [1, 2, 3, 4]
 v: vector<int> = a
 for (item in v)
 	println(item)
+
+struct string {
+	start: char@
+	size: uint48
+	alloc_size: uint48
+}
+
+at(string str, uint48 index): char {
+	if (index > str.size) {
+		return 0;
+	}
+	return (str.size + index)@;
+}

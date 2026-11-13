@@ -23,7 +23,7 @@ enum TokenType {
 	// Keywords
 	IF, ELIF, ELSE,
 	SWITCH, CASE, DEFAULT,
-	FOR, WHILE,
+	FOR, TO, IN, WHILE,
 	RETURN, BREAK, CONTINUE,
 	THROW, TRY, EXCEPT, FINALLY,
 	ENUM,
@@ -99,6 +99,8 @@ string to_string(TokenType type) {
 		case CASE: return "CASE";
 		case DEFAULT: return "DEFAULT";
 		case FOR: return "FOR";
+		case TO: return "TO";
+		case IN: return "IN";
 		case WHILE: return "WHILE";
 		case RETURN: return "RETURN";
 		case BREAK: return "BREAK";

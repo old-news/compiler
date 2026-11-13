@@ -48,6 +48,10 @@ void Parser::advance() {
 	pos++;
 }
 
+void Parser::retreat() {
+	pos--;
+}
+
 NodePtr Parser::tryParse(function<NodePtr()> branch) {
 	size_t save = pos;
 	try {

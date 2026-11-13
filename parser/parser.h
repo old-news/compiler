@@ -21,6 +21,7 @@ class Parser {
 		Token match(TokenType);
 		Token tryMatch(TokenType);
 		void advance();
+		void retreat();
 		NodePtr tryParse(function<NodePtr()>);
 		NodePtr tryParseStar(function<NodePtr()>);
 		NodePtr list(function<NodePtr()>, TokenType);
@@ -77,6 +78,18 @@ class Parser {
 		NodePtr class_access_level();
 		NodePtr class_var_section();
 		NodePtr class_var_group();
+
+		NodePtr control_flow();
+		NodePtr while_block();
+		NodePtr for_block();
+		NodePtr for_inner();
+		NodePtr if_block();
+		NodePtr elif_block();
+		NodePtr else_block();
+		NodePtr switch_block();
+		NodePtr switch_inner();
+		NodePtr switch_case();
+		NodePtr switch_default();
 	public:
 		Parser(const vector<Token>& i);
 		NodePtr parse();
