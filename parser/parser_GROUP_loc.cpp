@@ -40,6 +40,7 @@ NodePtr Parser::control_flow_interruption() {
 			break;
 		case BREAK: case CONTINUE:
 			n->add(match(t));
+			break;
 		default:
 			throw ParserException(UNEXPECTED_TOKEN, "Control flow interruption expected", getpos());
 	}

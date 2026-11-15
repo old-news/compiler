@@ -68,6 +68,7 @@ class Parser {
 		NodePtr enum_definition();
 
 		NodePtr import_line();
+		NodePtr importee();
 		NodePtr id_chain();
 
 		NodePtr error_block();

@@ -284,6 +284,8 @@ NodePtr Parser::function_call() {
 	match(OPEN_PARENTHESIS);
 	if (CLOSE_PARENTHESIS != currtype()) {
 		n->add(ARGS, list([this] {return expression();}, COMMA));
+	} else {
+		n->add(make_unique<Node>(ARGS));
 	}
 	match(CLOSE_PARENTHESIS);
 	return n;

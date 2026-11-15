@@ -45,9 +45,11 @@ NodePtr Parser::class_access_level() {
 NodePtr Parser::class_var_section() {
 	NodePtr n = make_unique<Node>(CLASS_VAR_SECTION);
 	n->add(var_decl(true));
+	loc_end();
 	NodePtr c;
 	while ((c = tryParse([this] {return var_decl(true);}))) {
 		n->add(std::move(c));
+		loc_end();
 	}
 	return n;
 }

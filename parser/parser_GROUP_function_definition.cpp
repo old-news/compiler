@@ -9,10 +9,12 @@ NodePtr Parser::function_definition(bool is_class_function) {
 	NodePtr n = make_unique<Node>(FUNCTION_DEFINITION);
 	n->add(NAME, match(ID));
 	match(OPEN_PARENTHESIS);
-	n->add(
-		ARGS,
-		list([this] {return var_ldecl();}, COMMA)
-	);
+	if (CLOSE_PARENTHESIS != currtype()) {
+		n->add(
+			ARGS,
+			list([this] {return var_ldecl();}, COMMA)
+		);
+	}
 	match(CLOSE_PARENTHESIS);
 	match(COLON);
 	if (is_class_function) {

@@ -1,15 +1,8 @@
-foo(bar: int): chicken {
-	return baz
-}
-
-
-v: char = foo(2)
-x: int = thing%7
-
-class Joel {
-	x, y, z: bool;
-
-	Joel(): protected int {
-		return pi;
+switch a {
+	1 {
+		break
+	}
+	4 {
+		hi()
 	}
 }

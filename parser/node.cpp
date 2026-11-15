@@ -137,4 +137,3 @@ Node::Node(NodeType type, unique_ptr<Node> uniq) {
 			children[i]->print(depth + 1);
 		}
 	}
-using NodePtr = unique_ptr<Node>;

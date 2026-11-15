@@ -21,7 +21,11 @@ Token Parser::unpeek(size_t n) {
 }
 
 Token Parser::peek(size_t n) {
-	return input[pos + n];
+	size_t i = 0;
+	while (NEWLINE == input[pos + i].getType()) {
+		i++;
+	}
+	return input[pos + n + i];
 }
 
 bool Parser::empty() {
@@ -35,6 +39,11 @@ Pos Parser::getpos() {
 Token Parser::match(TokenType type) {
 	if (empty()) {
 		throw ParserException(SOOK_PAST_END, "Matched beyond input end", getpos());
+	}
+	if (NEWLINE != type) {
+		while (NEWLINE == currtype()) {
+			advance();
+		}
 	}
 	Token c = curr();
 	if (type == c.getType()) {
@@ -84,9 +93,12 @@ NodePtr Parser::tryParseStar(function<NodePtr()> branch) {
 NodePtr Parser::list(function<NodePtr()> variable) {
 	NodePtr c = variable();
 	NodePtr n = tryParseStar(variable);
-	n->add(std::move(c));
-	n->add(variable());
-	return n;
+	NodePtr parent = make_unique<Node>(LIST);
+	parent->add(std::move(c));
+	for (size_t i = 0; i < n->children.size(); i++) {
+		parent->add(std::move(n->children[i]));
+	}
+	return parent;
 }
 
 NodePtr Parser::list(function<NodePtr()> variable, TokenType delim) {
@@ -133,7 +145,7 @@ NodePtr Parser::type() {
 	}
 	TokenType t;
 	bool lastWasClass;
-	while (CLOSE_PARENTHESIS != (t = currtype()) && OPEN_CURLY != t && ASSIGN != t) {
+	while (CLOSE_PARENTHESIS != (t = currtype()) && OPEN_CURLY != t && ASSIGN != t && NEWLINE != t && SEMICOLON != t) {
 		lastWasClass = false;
 		switch (t) {
 			case AT_SYMBOL:

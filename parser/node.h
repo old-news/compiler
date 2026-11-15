@@ -43,17 +43,11 @@ struct Node {
 	explicit Node(NodeType type, unique_ptr<Node> uniq);
 
 	void add(unique_ptr<Node> child);
-
 	void add(NodeType ntype, unique_ptr<Node> child);
-
 	void add(Token tchild);
-
 	void add(NodeType ntype, Token tchild);
-
 	void print();
-
 	unique_ptr<Node> last();
-
 	void print(int depth);
 };
 

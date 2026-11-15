@@ -16,6 +16,7 @@ NodePtr Parser::control_flow() {
 
 NodePtr Parser::for_block() {
 	NodePtr n = make_unique<Node>(FOR_BLOCK);
+	match(FOR);
 	n->add(for_inner());
 	enter_scope();
 	n->add(BODY, compound_block());
@@ -38,6 +39,7 @@ NodePtr Parser::for_inner() {
 
 NodePtr Parser::while_block() {
 	NodePtr n = make_unique<Node>(WHILE_BLOCK);
+	match(WHILE);
 	n->add(CONDITION, expression());
 	enter_scope();
 	n->add(BODY, compound_block());
@@ -47,6 +49,7 @@ NodePtr Parser::while_block() {
 
 NodePtr Parser::if_block() {
 	NodePtr n = make_unique<Node>(IF_BLOCK);
+	match(IF);
 	n->add(CONDITION, expression());
 	enter_scope();
 	n->add(BODY, compound_block());
@@ -84,6 +87,7 @@ NodePtr Parser::else_block() {
 
 NodePtr Parser::switch_block() {
 	NodePtr n = make_unique<Node>(SWITCH_BLOCK);
+	match(SWITCH);
 	n->add(expression());
 	enter_scope();
 	n->add(switch_inner());
