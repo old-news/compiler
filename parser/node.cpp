@@ -89,6 +89,10 @@ struct Node {
 		print(0);
 	}
 
+	unique_ptr<Node> last() {
+		return std::move(children.back());
+	}
+
 	void print(int depth) {
 		string s = to_string(depth);
 		if (s.size() < 5) {

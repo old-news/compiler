@@ -15,6 +15,7 @@ class Parser {
 
 		Token curr();
 		TokenType currtype();
+		Token unpeek(size_t);
 		Token peek(size_t);
 		bool empty();
 		Pos getpos();

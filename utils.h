@@ -9,4 +9,8 @@ struct Pos {
 	std::string toString() const {
 		return "(" + std::to_string(line) + ", " + std::to_string(col) + ")";
 	}
+
+	Pos plus(int l, int c) {
+		return {line + l, col + c};
+	}
 };

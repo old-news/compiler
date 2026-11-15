@@ -12,6 +12,13 @@ TokenType Parser::currtype() {
 	return input[pos].getType();
 }
 
+Token Parser::unpeek(size_t n) {
+	if (pos - n < 0) {
+		throw ParserException(SOOK_PAST_END, "Unpeeked to before start", getpos());
+	}
+	return input[pos - n];
+}
+
 Token Parser::peek(size_t n) {
 	return input[pos + n];
 }
@@ -111,10 +118,31 @@ void Parser::loc_end() {
 
 NodePtr Parser::type() {
 	NodePtr n = make_unique<Node>(TYPE);
-	Token t = tryMatch(CONST);
-	if (t.isValid()) {
-		n->add(t);
+	if (CONST == currtype()) {
+		n->add(match(CONST));
 	}
-	n->add(match(ID));
-	// ADD MORE HERE PLEASE IM BEGGING YOU
+	switch (currtype()) {
+		case AT_SYMBOL:
+			n->add(match(AT_SYMBOL));
+			break;
+		case OPEN_BRACKET: {
+			match(OPEN_BRACKET);
+			NodePtr c = tryParse([this] {return expression();});
+			if (!c) {
+				c = type();
+			}
+			match(CLOSE_BRACKET);
+			n->add(std::move(c));
+			break;
+		}
+		case ID:
+			n->add(match(ID));
+			break;
+		default:
+			throw ParserException(UNEXPECTED_TOKEN, "Expected type", getpos());
+	}
+	if (ID != unpeek(1).getType()) {
+		throw ParserException(UNEXPECTED_TOKEN, "Expected previous token to be a class", getpos());
+	}
+	return n;
 }
