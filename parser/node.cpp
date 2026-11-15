@@ -1,32 +1,13 @@
-#include "../tokenizer/token.cpp"
+#pragma once
+
+#include "../tokenizer/token.h"
+#include "node.h"
 
 #include <vector>
 #include <memory>
 #include <iostream>
 
 using namespace std;
-
-enum NodeType {
-	UNINITIALIZED, PROGRAM, COMPOUND_BLOCK, BLOCK, TYPE,
-	LIST, NAME, BODY, CONDITION,
-	TOKEN,
-	EXPRESSION,
-		E0, E1, E2, E2b, E3, E3b, E3c, E3d, E4, E5, E6, E7, E8, LITERAL, TERNARY_OPERATOR,
-		VVALUE, V1, V2, V3, VUNIT, ARRAY_INDEXING, ARRAY_EXPRESSION, FUNCTION_CALL,
-	FUNCTION_DEFINITION,
-		ARGS, VAR_LDECL,
-	ENUM_DEFINITION,
-	IMPORT_LINE,
-		IMPORTEE, LOCATION,
-	ERROR_BLOCK,
-		TRY_BLOCK, EXCEPT_BLOCK, FINALLY_BLOCK,
-	CLASS_DEFINITION,
-		INHERITS_FROM, CLASS_FUNC_SECTION, CLASS_FUNCTION, CLASS_ACCESS, CLASS_VAR_SECTION, CLASS_VAR_GROUP, DESTRUCTOR,
-	CONTROL_FLOW,
-		FOR_BLOCK, FOR_INNER, WHILE_BLOCK, IF_BLOCK, ELIF_BLOCK, ELSE_BLOCK, SWITCH_BLOCK, SWITCH_CASE, SWITCH_INNER, SWITCH_CASE_LIST, SWITCH_DEFAULT, CASE_VALUE_LIST,
-	LOC,
-		CONTROL_FLOW_INTERRUPTION, THROW_STATEMENT, VAR_DECL, VAR_FORWARD_DECL, VAR_ASSIGNMENT, LVALUE, RVALUE,
-};
 
 string toString(NodeType type) {
 	switch (type) {
@@ -57,43 +38,41 @@ string toString(NodeType type) {
 	return "UNKNOWN";
 }
 
-struct Node {
-	NodeType type;
-	Token token;
-	vector<unique_ptr<Node>> children;
+Node::Node(NodeType t) : type(t) {};
+Node::Node(Token t) : type(TOKEN), token(t) {};
+Node::Node(NodeType type, Token tok) : type(type), token(tok) {};
+Node::Node(NodeType type, unique_ptr<Node> uniq) {
+		type = type;
+		children = std::move(uniq->children);
+	}
 
-	explicit Node(NodeType t) : type(t) {};
-	explicit Node(Token t) : type(TOKEN), token(t) {};
-	explicit Node(NodeType type, Token tok) : type(type), token(tok) {};
-	explicit Node(NodeType type, unique_ptr<Node> uniq) : type(type), children(uniq->children) {};
-
-	void add(unique_ptr<Node> child) {
+	void Node::add(unique_ptr<Node> child) {
 		children.push_back(std::move(child));
 	}
 
-	void add(NodeType ntype, unique_ptr<Node> child) {
+	void Node::add(NodeType ntype, unique_ptr<Node> child) {
 		child->type = ntype;
 		children.push_back(std::move(child));
 	}
 
-	void add(Token tchild) {
+	void Node::add(Token tchild) {
 		add(make_unique<Node>(tchild));
 	}
 
-	void add(NodeType ntype, Token tchild) {
+	void Node::add(NodeType ntype, Token tchild) {
 		add(make_unique<Node>(ntype, tchild));
 	}
 
-	void print() {
+	void Node::print() {
 		cout << "DEPTH │ TREE" << endl << "──────┼─────" << endl;
 		print(0);
 	}
 
-	unique_ptr<Node> last() {
+	unique_ptr<Node> Node::last() {
 		return std::move(children.back());
 	}
 
-	void print(int depth) {
+	void Node::print(int depth) {
 		string s = to_string(depth);
 		if (s.size() < 5) {
 			s.insert(0, 5 - s.size(), ' ');
@@ -107,6 +86,4 @@ struct Node {
 			children[i]->print(depth + 1);
 		}
 	}
-};
-
 using NodePtr = unique_ptr<Node>;

@@ -1,5 +1,6 @@
+#pragma once
+
 #include "parser.h"
-#include "parser_exception.cpp"
 #include <memory>
 
 Parser::Parser(const vector<Token>& i) : input(i), pos(0) {};

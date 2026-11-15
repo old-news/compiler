@@ -1,15 +1,12 @@
 #pragma once
 
 #include "../utils.h"
+#include "parser_exception.h"
 
 #include <string>
 
 using namespace std;
 
-enum ParserExceptionType  {
-	SOOK_PAST_END,
-	UNEXPECTED_TOKEN, EMPTY_PROGRAM,
-};
 
 string to_string(ParserExceptionType t) {
 	switch (t) {
@@ -20,27 +17,19 @@ string to_string(ParserExceptionType t) {
 	return "UNKNOWN";
 }
 
-class ParserException : public exception {
-	private:
-		ParserExceptionType  type;
-		string message;
-		Pos pos;
-		string what_message;
-	public:
-		ParserException (const string& msg, const Pos& p) : message(msg), pos(p) {buildWhatMessage();};
-		ParserException (const ParserExceptionType& ntype, const Pos& p) : type(ntype), pos(p) {buildWhatMessage();};
-		ParserException (const ParserExceptionType& ntype, const string& msg, const Pos& p) : type(ntype), message(msg), pos(p) {buildWhatMessage();};
+ParserException::ParserException (const string& msg, const Pos& p) : message(msg), pos(p) {buildWhatMessage();};
+ParserException::ParserException (const ParserExceptionType& ntype, const Pos& p) : type(ntype), pos(p) {buildWhatMessage();};
+ParserException::ParserException (const ParserExceptionType& ntype, const string& msg, const Pos& p) : type(ntype), message(msg), pos(p) {buildWhatMessage();};
 
-		string getMessage() const { return message; }
-		ParserExceptionType getType() const { return type; }
-		string toString() const {
+		string ParserException::getMessage() const { return message; }
+		ParserExceptionType ParserException::getType() const { return type; }
+		string ParserException::toString() const {
 			return "Tokenizer Exception (" + to_string(type) + "): " + what_message;
 		}
-		const char* what() const noexcept override {
+		const char* ParserException::what() const noexcept {
 			return what_message.c_str();
 		}
 
-		const void buildWhatMessage() {
+		const void ParserException::buildWhatMessage() {
 			what_message = message + " at " + pos.toString();
 		}
-};

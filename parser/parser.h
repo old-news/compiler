@@ -1,6 +1,8 @@
-#include "../tokenizer/token.cpp"
-#include "parser_exception.cpp"
-#include "node.cpp"
+#pragma once
+
+#include "../tokenizer/token.h"
+#include "node.h"
+#include "parser_exception.h"
 
 #include <vector>
 #include <functional>
@@ -27,7 +29,6 @@ class Parser {
 		NodePtr tryParseStar(function<NodePtr()>);
 		NodePtr list(function<NodePtr()>);
 		NodePtr list(function<NodePtr()>, TokenType);
-		NodePtr list(function<Token()>, TokenType);
 		void enter_scope();
 		void exit_scope();
 		void loc_end();
