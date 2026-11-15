@@ -3,13 +3,13 @@ import subprocess
 import time
 
 
-APP_NAME = 'built'
+APP_NAME = 'compiler'
 
 
 def setup():
-    subprocess.Popen(['rm', '-rf', 'out']).wait()
+    subprocess.Popen(['rm', '-rf', 'objects']).wait()
     subprocess.Popen(['rm', '-f', APP_NAME]).wait()
-    subprocess.Popen(['mkdir', 'out'])
+    subprocess.Popen(['mkdir', 'objects'])
 
 
 def recl(spath, ignore=None):
@@ -41,8 +41,8 @@ def recl(spath, ignore=None):
 def compile(cppfiles):
     processes = []
     for fname in cppfiles:
-        builtName = f"out/{'\\'.join(fname.rstrip('.cpp').split('/'))}.o"
-        # if os.path.exists(os.path.join('out', builtName)):
+        builtName = f"objects/{'\\'.join(fname.rstrip('.cpp').split('/'))}.o"
+        # if os.path.exists(os.path.join('objects', builtName)):
             # continue
         process = subprocess.Popen(['g++', '-g', '-Wall', '-c', fname, '-o', builtName])
         processes.append(process)
@@ -59,7 +59,7 @@ def compile(cppfiles):
 
 def link():
     subprocess.Popen(
-            [f'g++ out/*.o -o {APP_NAME} -flto=auto'],
+            [f"g++ objects/*.o -o {APP_NAME} -flto=auto"],
             shell=True
     )
 
