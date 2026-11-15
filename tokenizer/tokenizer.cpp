@@ -1,5 +1,6 @@
-#include "token.cpp"
-#include "tokenizer_exceptions.cpp"
+#include "token.h"
+#include "tokenizer_exceptions.h"
+#include "tokenizer.h"
 
 #include <cstddef>
 #include <vector>
@@ -9,19 +10,7 @@
 
 using namespace std;
 
-class Tokenizer {
-	private:
-		string input;
-		size_t pos;
-		Pos filepos;
-		vector<Token> tokens;
-		unordered_map<string, TokenType> keywords;
-		bool should_indent_increase;
-		string previous_indent;
-		int indent_gcd;
-	
-	public:
-		Tokenizer(const string& in) {
+Tokenizer::Tokenizer(const string& in) {
 			input = in;
 			pos = 0;
 			filepos = {1, 1};
@@ -31,7 +20,7 @@ class Tokenizer {
 			init_keywords();
 		}
 
-		void init_keywords() {
+		void Tokenizer::init_keywords() {
 			keywords = {
 				{"if", IF}, {"elif", ELIF}, {"else", ELSE},
 				{"switch", SWITCH}, {"case", CASE}, {"default", DEFAULT},
@@ -48,7 +37,7 @@ class Tokenizer {
 			};
 		}
 
-		vector<Token> tokenize() {
+		vector<Token> Tokenizer::tokenize() {
 			while (pos < input.size()) {
 				try {
 					tokenize_next();
@@ -66,7 +55,7 @@ class Tokenizer {
 			return tokens;
 		}
 
-		void tokenize_next() {
+		void Tokenizer::tokenize_next() {
 			char n = next();
 			if ('\n' != n) {
 				should_indent_increase = false;
@@ -228,15 +217,15 @@ class Tokenizer {
 			}
 		}
 
-		void add(TokenType type) {
+		void Tokenizer::add(TokenType type) {
 			add(type, 1);
 		}
 
-		void add(TokenType type, size_t len) {
+		void Tokenizer::add(TokenType type, size_t len) {
 			add(type, input.substr(pos, len));
 		}
 
-		void add(TokenType type, string value) {
+		void Tokenizer::add(TokenType type, string value) {
 			tokens.push_back(Token(type, value, filepos.line, filepos.col));
 			if ('\n' == input[pos + value.length() - 1]) {
 				filepos.line++;
@@ -247,29 +236,29 @@ class Tokenizer {
 			pos += value.length();
 		}
 
-		char next() {
+		char Tokenizer::next() {
 			return next(0);
 		}
 
-		char next(size_t n) {
+		char Tokenizer::next(size_t n) {
 			if (pos + n >= input.size()) {
 				throw TokenizerException(SOOK_PAST_INPUT, "sook past input length");
 			}
 			return input[pos + n];
 		}
 
-		bool iswspace(char c) {
+		bool Tokenizer::iswspace(char c) {
 			switch (c) {
 				case ' ': case '\t': case '\n': case '\f': return true;
 				default: return false;
 			}
 		}
 
-		bool isidchar(char c) {
+		bool Tokenizer::isidchar(char c) {
 			return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
 		}
 
-		void handle_newline_indentation() {
+		void Tokenizer::handle_newline_indentation() {
 			size_t seek = 0;
 			char curr = next(seek);
 			string indent = "";
@@ -328,4 +317,3 @@ class Tokenizer {
 				previous_indent = indent;
 			}
 		}
-};

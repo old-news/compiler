@@ -122,7 +122,8 @@ NodePtr Parser::type() {
 	if (CONST == currtype()) {
 		n->add(match(CONST));
 	}
-	switch (currtype()) {
+	TokenType t = currtype();
+	switch (t) {
 		case AT_SYMBOL:
 			n->add(match(AT_SYMBOL));
 			break;
@@ -138,6 +139,9 @@ NodePtr Parser::type() {
 		}
 		case ID:
 			n->add(match(ID));
+			break;
+		case INT: case BOOL: case STRING_TYPE: case CHAR: case FLOAT:
+			n->add(match(t));
 			break;
 		default:
 			throw ParserException(UNEXPECTED_TOKEN, "Expected type", getpos());

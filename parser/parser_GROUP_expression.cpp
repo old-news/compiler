@@ -187,18 +187,24 @@ NodePtr Parser::e7() {
 
 NodePtr Parser::e8() {
 	NodePtr n = make_unique<Node>(E8);
-	n->add(literal());
+	NodePtr c = tryParse([this] {return literal();});
+	if (c) {
+		n->add(std::move(c));
+		return n;
+	}
+	n->add(vvalue());
 	return n;
 }
 
 NodePtr Parser::literal() {
 	NodePtr n = make_unique<Node>(LITERAL);
-	switch (currtype()) {
-		case NULL_LITERAL: n->add(make_unique<Node>(match(NULL_LITERAL))); break;
-		case NUMBER: n->add(make_unique<Node>(match(NUMBER))); break;
-		case STRING: n->add(make_unique<Node>(match(STRING))); break;
-		case BOOLEAN: n->add(make_unique<Node>(match(BOOLEAN))); break;
-		default: throw ParserException(UNEXPECTED_TOKEN, "Expected literal value", getpos());
+	TokenType t = currtype();
+	switch (t) {
+		case NULL_LITERAL: case NUMBER: case STRING: case TRUE: case FALSE:
+			n->add(match(t));
+			break;
+		default:
+			throw ParserException(UNEXPECTED_TOKEN, "Expected literal value", getpos());
 	}
 	return n;
 }

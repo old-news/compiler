@@ -1,5 +1,5 @@
-#include "tokenizer.cpp"
-#include "parser/parser.cpp"
+#include "tokenizer/tokenizer.h"
+#include "parser/parser.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -55,10 +55,11 @@ void write_file(string filename, string output) {
 int main(int argc, char** argv) {
 	unordered_map<FLAG, string> flags = parse_flags(argc, argv);
 	string source_code = read_file(flags.at(INPUT_NAME));
-	string stdlib_code = read_file("stdlib.bv");
-	string input_code = stdlib_code + '\n' + source_code;
+	string stdlib_code = "";	// read_file("stdlib.bv");
+	string input_code = source_code;	// stdlib_code + '\n' + source_code;
 	vector<Token> tokens = Tokenizer(input_code).tokenize();
 	NodePtr parsed = Parser(tokens).parse();
+	parsed->print();
 	/*
 	 * vector<exception> errors = Validator(parsed).validate();
 	 * if (!errors.empty()) {
@@ -68,10 +69,10 @@ int main(int argc, char** argv) {
 		 * return -1;
 	 * }
 	 */
-	Semantic sma = SemanticAnalyzer(parsted).analyze();
-	IR ir = InternalRepresentation(sma).generate();
-	IR optimized = Optimizer(ir).optimize();
-	string assembly = Objectifier(optimized).objectify();
-	vector<uint8_t> assembled = Assembler(assembly).assemble();
-	write_file("a.out", assembled);
+	// Semantic sma = SemanticAnalyzer(parsted).analyze();
+	// IR ir = InternalRepresentation(sma).generate();
+	// IR optimized = Optimizer(ir).optimize();
+	// string assembly = Objectifier(optimized).objectify();
+	// vector<uint8_t> assembled = Assembler(assembly).assemble();
+	// write_file("a.out", assembled);
 }

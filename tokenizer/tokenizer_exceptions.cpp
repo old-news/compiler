@@ -1,14 +1,7 @@
-#pragma once
+#include "tokenizer_exceptions.h"
 #include <string>
 
 using namespace std;
-
-enum TokenizerExceptionType  {
-	UNTERMINATED_STRING,
-	UNMATCHED_PARENTHESIS,
-	INVALID_INDENT,
-	SOOK_PAST_INPUT
-};
 
 string to_string(TokenizerExceptionType t) {
 	switch (t) {
@@ -20,21 +13,15 @@ string to_string(TokenizerExceptionType t) {
 	return "UNKNOWN";
 }
 
-class TokenizerException : public exception {
-	private:
-		TokenizerExceptionType  type;
-		string message;
-	public:
-		TokenizerException (const string& msg) : message(msg) {};
-		TokenizerException (const TokenizerExceptionType & ntype) : type(ntype) {};
-		TokenizerException (const TokenizerExceptionType & ntype, const string& msg) : type(ntype), message(msg) {};
+TokenizerException::TokenizerException (const string& msg) : message(msg) {};
+TokenizerException::TokenizerException (const TokenizerExceptionType & ntype) : type(ntype) {};
+TokenizerException::TokenizerException (const TokenizerExceptionType & ntype, const string& msg) : type(ntype), message(msg) {};
 
-		string getMessage() const { return message; }
-		TokenizerExceptionType getType() const { return type; }
-		string toString() const {
+		string TokenizerException::getMessage() const { return message; }
+		TokenizerExceptionType TokenizerException::getType() const { return type; }
+		string TokenizerException::toString() const {
 			return "Tokenizer Exception (" + to_string(type) + "): " + message;
 		}
-		const char* what() const noexcept override {
+		const char* TokenizerException::what() const noexcept {
 			return message.c_str();
 		}
-};

@@ -1,78 +1,11 @@
 #pragma once
 
 #include "../utils.h"
+#include "token.h"
 
 #include <string>
 
 using namespace std;
-
-enum TokenType {
-	// Special
-	INVALID,            // default-constructed / unrecognized token
-	END,                // end of input
-
-	INDENT, DEDENT, NEWLINE,
-
-	// Identifiers and literals
-	ID,
-	NUMBER,
-	STRING,
-	BOOLEAN,
-	NULL_LITERAL,
-
-	// Keywords
-	IF, ELIF, ELSE,
-	SWITCH, CASE, DEFAULT,
-	FOR, TO, IN, WHILE,
-	RETURN, BREAK, CONTINUE,
-	THROW, TRY, EXCEPT, FINALLY,
-	ENUM,
-	IMPORT, FROM, AS,
-	CONST, BOOL, INT, STRING_TYPE, CHAR, FLOAT,
-	TRUE, FALSE,
-	CLASS, PRIVATE, PROTECTED, PUBLIC, CHILDOF, TEMPLATE, ADHERESTO,
-
-	// Delimiters
-	OPEN_PARENTHESIS, CLOSE_PARENTHESIS,   // ( )
-	OPEN_CURLY, CLOSE_CURLY,               // { }
-	OPEN_BRACKET, CLOSE_BRACKET,           // [ ]
-	SEMICOLON,                             // ;
-	COLON,                                 // :
-	COMMA,                                 // ,
-	PERIOD,                                // .
-	ARROW,                                 // ->
-	QUESTION_MARK,
-	AT_SYMBOL,				// @
-	MONEY_SIGN,				// $
-
-	// Logical / comparison operators
-	LOGICAL_OR, LOGICAL_AND,               // || &&
-	LOGICAL_NOT,                           // !
-	EQUAL_DOUBLE, NOT_EQUAL,               // == !=
-	LESS, GREATER,                         // < >
-	LESS_EQUAL, GREATER_EQUAL,             // <= >=
-
-	// Bitwise operators
-	BITWISE_OR, BITWISE_XOR, BITWISE_AND,  // | ^ &
-	SHIFT_LEFT, SHIFT_RIGHT,               // << >>
-	BITWISE_NOT,                           // ~
-
-	// Arithmetic operators
-	PLUS, MINUS,                           // + -
-	STAR, SLASH, MODULO,                  // * / %
-	POWER, INTEGER_DIVIDE,                 // ** //
-	INCREMENT, DECREMENT,                  // ++ --
-
-	// Assignment operators
-	ASSIGN,					// =
-	ASSIGN_TYPED,				// :=
-	ASSIGN_PLUS, ASSIGN_MINUS,		// += -=
-	ASSIGN_STAR, ASSIGN_SLASH,		// *= /=
-	ASSIGN_POWER, ASSIGN_MODULO,		// **= %=
-	ASSIGN_INTEGER_DIVIDE,			// //=
-	ASSIGN_OR, ASSIGN_XOR, ASSIGN_AND,     // |= ^= &=
-	ASSIGN_SHIFT_LEFT, ASSIGN_SHIFT_RIGHT  // <<= >>=
-};
 
 string to_string(TokenType type) {
 	switch (type) {
@@ -88,7 +21,6 @@ string to_string(TokenType type) {
 		case ID: return "ID";
 		case NUMBER: return "NUMBER";
 		case STRING: return "STRING";
-		case BOOLEAN: return "BOOLEAN";
 		case NULL_LITERAL: return "NULL_LITERAL";
 
 		// Keywords
@@ -194,50 +126,43 @@ string to_string(TokenType type) {
 	return "UNKNOWN";
 }
 
-class Token {
-	private:
-		TokenType type;
-		string value;
-		Pos pos;
-	public:
-		Token() : type(INVALID), value(""), pos({0, 0}) {}
+Token::Token() : type(INVALID), value(""), pos({0, 0}) {}
 
-		explicit Token(TokenType ty, const string& text = "", size_t ln = 0, size_t col = 0)
+		Token::Token(TokenType ty, const string& text = "", size_t ln = 0, size_t col = 0)
 			: type(ty), value(text), pos({ln, col}) {}
 
-		TokenType getType() const {
+		TokenType Token::getType() const {
 			return type;
 		}
 
-		const string& getValue() const {
+		const string& Token::getValue() const {
 			return value;
 		}
 
-		size_t getLine() const {
+		size_t Token::getLine() const {
 			return pos.line;
 		}
 
-		size_t getColumn() const {
+		size_t Token::getColumn() const {
 			return pos.col;
 		}
 
-		Pos getPos() const {
+		Pos Token::getPos() const {
 			return pos;
 		}
 
-		bool is(TokenType ty) const {
+		bool Token::is(TokenType ty) const {
 			return type == ty;
 		}
 
-		string toString() {
+		string Token::toString() {
 			return "(" + to_string(type) + ", '" + value + "', [" + std::to_string(pos.line) + ", " + std::to_string(pos.col) + "])";
 		}
 
-		bool isLiteral() {
-			return NULL_LITERAL == type || INT == type || STRING == type || BOOLEAN == type;
+		bool Token::isLiteral() {
+			return NULL_LITERAL == type || NUMBER == type || STRING == type || TRUE == type || FALSE == type;
 		}
 
-		bool isValid() {
+		bool Token::isValid() {
 			return INVALID != type;
 		}
-};
