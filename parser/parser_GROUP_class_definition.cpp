@@ -13,6 +13,7 @@ NodePtr Parser::class_definition() {
 	enter_scope();
 	n->add(class_def_body());
 	exit_scope();
+	return n;
 }
 
 NodePtr Parser::class_def_body() {

@@ -54,16 +54,24 @@ NodePtr Parser::throw_statement() {
 }
 
 NodePtr Parser::var_decl() {
+	return var_decl(false);
+}
+
+NodePtr Parser::var_decl(bool is_class_var) {
 	NodePtr n = make_unique<Node>(VAR_DECL);
 	if (COMMA == peek(1).getType()) {
 		n = var_forward_decl();
 		return n;
 	}
 	n->add(NAME, match(ID));
-	if (ASSIGN_TYPED == currtype()) {
+	if (ASSIGN_TYPED == currtype() && !is_class_var) {
 		n->add(match(ASSIGN_TYPED));
 	} else {
+		match(COLON);
 		n->add(type());
+		if (is_class_var) {
+			n->add(class_access_level());
+		}
 		n->add(match(ASSIGN));
 	}
 	n->add(expression());
