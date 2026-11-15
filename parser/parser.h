@@ -90,6 +90,13 @@ class Parser {
 		NodePtr switch_inner();
 		NodePtr switch_case();
 		NodePtr switch_default();
+
+		NodePtr loc();
+		NodePtr control_flow_interruption();
+		NodePtr throw_statement();
+		NodePtr var_decl();
+		NodePtr var_forward_decl();
+		NodePtr var_assignment();
 	public:
 		Parser(const vector<Token>& i);
 		NodePtr parse();
