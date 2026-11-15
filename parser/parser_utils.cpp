@@ -104,17 +104,26 @@ NodePtr Parser::parse() {
 }
 
 void Parser::enter_scope() {
-	match(COLON);
-	match(NEWLINE);
-	match(INDENT);
+	match(OPEN_CURLY);
+	/*
+	 * match(COLON);
+	 * match(NEWLINE);
+	 * match(INDENT);
+	 */
 }
 
 void Parser::exit_scope() {
-	match(DEDENT);
+	match(CLOSE_CURLY);
+	// match(DEDENT);
 }
 
 void Parser::loc_end() {
-	match(NEWLINE);
+	if (NEWLINE == currtype() || SEMICOLON == currtype()) {
+		advance();
+	} else {
+		// Throw an error when a loc_end is expected but isn't in the code
+		match(SEMICOLON);
+	}
 }
 
 NodePtr Parser::type() {
@@ -122,31 +131,37 @@ NodePtr Parser::type() {
 	if (CONST == currtype()) {
 		n->add(match(CONST));
 	}
-	TokenType t = currtype();
-	switch (t) {
-		case AT_SYMBOL:
-			n->add(match(AT_SYMBOL));
-			break;
-		case OPEN_BRACKET: {
-			match(OPEN_BRACKET);
-			NodePtr c = tryParse([this] {return expression();});
-			if (!c) {
-				c = type();
+	TokenType t;
+	bool lastWasClass;
+	while (CLOSE_PARENTHESIS != (t = currtype()) && OPEN_CURLY != t && ASSIGN != t) {
+		lastWasClass = false;
+		switch (t) {
+			case AT_SYMBOL:
+				n->add(match(AT_SYMBOL));
+				break;
+			case OPEN_BRACKET: {
+				match(OPEN_BRACKET);
+				NodePtr c = tryParse([this] {return expression();});
+				if (!c) {
+					c = type();
+				}
+				match(CLOSE_BRACKET);
+				n->add(std::move(c));
+				break;
 			}
-			match(CLOSE_BRACKET);
-			n->add(std::move(c));
-			break;
+			case ID:
+				n->add(match(ID));
+				lastWasClass = true;
+				break;
+			case INT: case BOOL: case STRING_TYPE: case CHAR: case FLOAT:
+				n->add(match(t));
+				lastWasClass = true;
+				break;
+			default:
+				throw ParserException(UNEXPECTED_TOKEN, "Expected type", getpos());
 		}
-		case ID:
-			n->add(match(ID));
-			break;
-		case INT: case BOOL: case STRING_TYPE: case CHAR: case FLOAT:
-			n->add(match(t));
-			break;
-		default:
-			throw ParserException(UNEXPECTED_TOKEN, "Expected type", getpos());
 	}
-	if (ID != unpeek(1).getType()) {
+	if (!lastWasClass) {
 		throw ParserException(UNEXPECTED_TOKEN, "Expected previous token to be a class", getpos());
 	}
 	return n;

@@ -14,7 +14,6 @@ Tokenizer::Tokenizer(const string& in) {
 			input = in;
 			pos = 0;
 			filepos = {1, 1};
-			should_indent_increase = false;
 			previous_indent = "";
 			indent_gcd = 0;
 			init_keywords();
@@ -48,8 +47,10 @@ Tokenizer::Tokenizer(const string& in) {
 					break;
 				}
 			}
-			if (NEWLINE == tokens.back().getType()) {
-				tokens.pop_back();
+			TokenType backType = tokens.back().getType();
+			if (NEWLINE != backType && SEMICOLON != backType) {
+				tokens.push_back(Token(NEWLINE, "\n", filepos.line, filepos.col+1));
+				// tokens.pop_back();
 			}
 			tokens.push_back(Token(END, "", filepos.line+1, 0));
 			return tokens;
@@ -63,7 +64,7 @@ Tokenizer::Tokenizer(const string& in) {
 			switch (n) {
 				case '\n':
 					add(NEWLINE);
-					handle_newline_indentation();
+					// handle_newline_indentation();
 					break;
 				case ' ': case '\t': case '\f':
 					filepos.col++;
@@ -80,7 +81,6 @@ Tokenizer::Tokenizer(const string& in) {
 					if ('=' == next(1)) {
 						add(ASSIGN_TYPED, 2);
 					} else {
-						should_indent_increase = true;
 						add(COLON);
 					}
 					break;

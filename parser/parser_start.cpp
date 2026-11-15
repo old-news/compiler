@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "parser_exception.h"
 #include <memory>
 
 NodePtr Parser::program() {
@@ -9,11 +10,22 @@ NodePtr Parser::program() {
 
 NodePtr Parser::compound_block() {
 	NodePtr n = make_unique<Node>(COMPOUND_BLOCK);
-	NodePtr c;
+	bool didAdd;
+	TokenType t;
 	do {
-		c = tryParse([this] {return block();});
-		if (c) n->add(std::move(c));
-	} while (c);
+		while (NEWLINE == (t = currtype())) {
+			match(NEWLINE);
+		}
+		if (END == t) {
+			break;
+		}
+		didAdd = false;
+		NodePtr c = block();
+		if (!c->children.empty()) {
+			n->add(std::move(c));
+			didAdd = true;
+		}
+	} while (didAdd);
 	return n;
 }
 
@@ -35,14 +47,20 @@ NodePtr Parser::block() {
 		case TRY:
 			n->add(error_block());
 			break;
+		case CLOSE_CURLY:
+			return n;
 		default:
 			NodePtr c = tryParse([this] {return loc();});
 			if (c) {
 				n->add(std::move(c));
 				break;
 			}
-			n->add(function_definition());
-			break;
+			c = tryParse([this] {return function_definition();});
+			if (c) {
+				n->add(std::move(c));
+				break;
+			}
+			throw ParserException(UNEXPECTED_TOKEN, "Expected something to be here", getpos());
 	}
 	return n;
 }
