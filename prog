@@ -1,4 +1,4 @@
 a := 1
 b := "s"
-print(a - b)
+/* this is stuff*/print(a - b)
 

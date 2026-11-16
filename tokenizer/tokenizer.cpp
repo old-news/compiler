@@ -164,9 +164,34 @@ void Tokenizer::tokenize_next() {
 		case '/':
 			switch (next(1)) {
 				case '=': add(ASSIGN_SLASH, 2); break;
-				case '/':
-					  ('=' == next(2)) ? add(ASSIGN_INTEGER_DIVIDE, 3) : add(INTEGER_DIVIDE, 2);
+				case '/': {
+					  size_t seek = 2;
+					  while ('\n' != next(seek)) {
+						  seek++;
+					  }
+					  // filepos.col += seek;
+					  pos += seek;
 					  break;
+				}
+				case '*': {
+					  size_t seek = 4;
+					  size_t coladd = 2;
+					  size_t rowadd = 0;
+					  while ('*' != next(seek - 2) && '/' != next(seek - 1)) {
+						  seek++;
+						  if ('\n' == next(seek)) {
+							  rowadd++;
+							  coladd = 0;
+						  } else {
+							  coladd++;
+						  }
+					  }
+					  pos += seek;
+					  filepos.col += coladd;
+					  filepos.line += rowadd;
+					  break;
+					  
+				}
 				default: add(SLASH);
 			}
 			break;
