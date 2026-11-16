@@ -62,10 +62,16 @@ Tokenizer::Tokenizer(const string& in) {
 				should_indent_increase = false;
 			}
 			switch (n) {
-				case '\n':
+				case '\n': {
+					TokenType prevt = tokens.back().getType();
 					add(NEWLINE);
+					if (tokens.size() > 1 && (NEWLINE == prevt || SEMICOLON == prevt)) {
+						// Don't have multiple newlines in a row
+						tokens.pop_back();
+					}
 					// handle_newline_indentation();
 					break;
+				}
 				case ' ': case '\t': case '\f':
 					filepos.col++;
 					pos++;

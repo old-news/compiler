@@ -1,8 +1,8 @@
-switch a {
-	1 {
-		break
-	}
-	4 {
-		hi()
-	}
+try {
+	hardWork()
+	print("Success")
+} except e: Exception {
+	print("Faild")
+} finally {
+	print("Just done")
 }

@@ -14,16 +14,29 @@ NodePtr Parser::error_block() {
 }
 
 NodePtr Parser::try_block() {
-	return make_unique<Node>(TRY_BLOCK, compound_block());
+	NodePtr n = make_unique<Node>(TRY_BLOCK);
+	match(TRY);
+	enter_scope();
+	n->add(BODY, compound_block());
+	exit_scope();
+	return n;
 }
 
 NodePtr Parser::except_block() {
 	NodePtr n = make_unique<Node>(EXCEPT_BLOCK);
+	match(EXCEPT);
 	n->add(var_ldecl());
+	enter_scope();
 	n->add(BODY, compound_block());
+	exit_scope();
 	return n;
 }
 
 NodePtr Parser::finally_block() {
-	return make_unique<Node>(FINALLY_BLOCK, compound_block());
+	NodePtr n = make_unique<Node>(FINALLY_BLOCK);
+	match(FINALLY);
+	enter_scope();
+	n->add(BODY, compound_block());
+	exit_scope();
+	return n;
 }

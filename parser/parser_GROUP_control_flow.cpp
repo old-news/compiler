@@ -78,7 +78,6 @@ NodePtr Parser::elif_block() {
 NodePtr Parser::else_block() {
 	NodePtr n = make_unique<Node>(ELSE_BLOCK);
 	match(ELSE);
-	n->add(CONDITION, expression());
 	enter_scope();
 	n->add(BODY, compound_block());
 	exit_scope();
@@ -104,7 +103,7 @@ NodePtr Parser::switch_inner() {
 		n->add(switch_default());
 		didDefault = true;
 	}
-	n->add(SWITCH_CASE_LIST, tryParseStar([this] {return switch_case();}));
+	n->add(SWITCH_CASE_LIST, list([this] {return switch_case();}));
 	if (!didDefault) {
 		t = tryMatch(DEFAULT);
 		if (!t.is(INVALID)) {
@@ -118,7 +117,7 @@ NodePtr Parser::switch_inner() {
 
 NodePtr Parser::switch_case() {
 	NodePtr n = make_unique<Node>(SWITCH_CASE);
-	n->add(CASE_VALUE_LIST, tryParseStar([this] {return expression();}));
+	n->add(CASE_VALUE_LIST, list([this] {return expression();}, COMMA));
 	enter_scope();
 	n->add(BODY, compound_block());
 	exit_scope();

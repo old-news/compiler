@@ -40,14 +40,12 @@ Token Parser::match(TokenType type) {
 	if (empty()) {
 		throw ParserException(SOOK_PAST_END, "Matched beyond input end", getpos());
 	}
-	if (NEWLINE != type) {
-		while (NEWLINE == currtype()) {
-			advance();
-		}
-	}
 	Token c = curr();
 	if (type == c.getType()) {
 		advance();
+		if (NEWLINE == currtype()) {
+			advance();
+		}
 		return c;
 	}
 	throw ParserException(UNEXPECTED_TOKEN, "Failed token match", getpos());
@@ -130,9 +128,9 @@ void Parser::exit_scope() {
 }
 
 void Parser::loc_end() {
-	if (NEWLINE == currtype() || SEMICOLON == currtype()) {
+	if (SEMICOLON == currtype()) {
 		advance();
-	} else {
+	} else if (NEWLINE != unpeek(1).getType()) {
 		// Throw an error when a loc_end is expected but isn't in the code
 		match(SEMICOLON);
 	}

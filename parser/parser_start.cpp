@@ -13,9 +13,7 @@ NodePtr Parser::compound_block() {
 	bool didAdd;
 	TokenType t;
 	do {
-		while (NEWLINE == (t = currtype())) {
-			match(NEWLINE);
-		}
+		t = currtype();
 		if (END == t) {
 			break;
 		}
