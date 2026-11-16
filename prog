@@ -1,4 +1,7 @@
 a := 1
 b := "s"
-/* this is stuff*/print(a - b)
+/* this is stuff
+ * more
+ */
+print(a - b)
 

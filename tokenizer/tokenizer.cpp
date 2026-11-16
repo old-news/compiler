@@ -177,7 +177,7 @@ void Tokenizer::tokenize_next() {
 					  size_t seek = 4;
 					  size_t coladd = 2;
 					  size_t rowadd = 0;
-					  while ('*' != next(seek - 2) && '/' != next(seek - 1)) {
+					  while ('*' != next(seek - 2) || '/' != next(seek - 1)) {
 						  seek++;
 						  if ('\n' == next(seek)) {
 							  rowadd++;
