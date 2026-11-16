@@ -18,26 +18,19 @@ class Tokenizer {
 	
 	public:
 		Tokenizer(const string& in);
-
 		void init_keywords();
 
 		vector<Token> tokenize();
-
 		void tokenize_next();
 
 		void add(TokenType type);
-
 		void add(TokenType type, size_t len);
-
 		void add(TokenType type, string value);
 
 		char next();
-
 		char next(size_t n);
 
 		bool iswspace(char c);
-
 		bool isidchar(char c);
-
 		void handle_newline_indentation();
 };

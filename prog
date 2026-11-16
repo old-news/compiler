@@ -1,8 +1,4 @@
-try {
-	hardWork()
-	print("Success")
-} except e: Exception {
-	print("Faild")
-} finally {
-	print("Just done")
-}
+a := 1
+b := "s"
+print(a - b)
+

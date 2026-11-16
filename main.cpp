@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 		 * return -1;
 	 * }
 	 */
-	// Semantic sma = SemanticAnalyzer(parsted).analyze();
+	// Semantic sma = SemanticAnalyzer(parsed).analyze();
 	// IR ir = InternalRepresentation(sma).generate();
 	// IR optimized = Optimizer(ir).optimize();
 	// string assembly = Objectifier(optimized).objectify();

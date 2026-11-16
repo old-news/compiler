@@ -82,24 +82,16 @@ class Token {
 		Pos pos;
 	public:
 		Token();
-
 		explicit Token(TokenType ty, const string& text, size_t ln, size_t col);
 
 		TokenType getType() const;
-
 		const string& getValue() const;
-
 		size_t getLine() const;
-
 		size_t getColumn() const;
-
 		Pos getPos() const;
 
 		bool is(TokenType ty) const;
-
 		string toString();
-
 		bool isLiteral();
-
 		bool isValid();
 };

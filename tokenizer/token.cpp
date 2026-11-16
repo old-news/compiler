@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../utils.h"
 #include "token.h"
 
@@ -128,41 +126,41 @@ string to_string(TokenType type) {
 
 Token::Token() : type(INVALID), value(""), pos({0, 0}) {}
 
-		Token::Token(TokenType ty, const string& text = "", size_t ln = 0, size_t col = 0)
-			: type(ty), value(text), pos({ln, col}) {}
+Token::Token(TokenType ty, const string& text = "", size_t ln = 0, size_t col = 0)
+	: type(ty), value(text), pos({ln, col}) {}
 
-		TokenType Token::getType() const {
-			return type;
-		}
+TokenType Token::getType() const {
+	return type;
+}
 
-		const string& Token::getValue() const {
-			return value;
-		}
+const string& Token::getValue() const {
+	return value;
+}
 
-		size_t Token::getLine() const {
-			return pos.line;
-		}
+size_t Token::getLine() const {
+	return pos.line;
+}
 
-		size_t Token::getColumn() const {
-			return pos.col;
-		}
+size_t Token::getColumn() const {
+	return pos.col;
+}
 
-		Pos Token::getPos() const {
-			return pos;
-		}
+Pos Token::getPos() const {
+	return pos;
+}
 
-		bool Token::is(TokenType ty) const {
-			return type == ty;
-		}
+bool Token::is(TokenType ty) const {
+	return type == ty;
+}
 
-		string Token::toString() {
-			return "(" + to_string(type) + ", '" + value + "', [" + std::to_string(pos.line) + ", " + std::to_string(pos.col) + "])";
-		}
+string Token::toString() {
+	return "(" + to_string(type) + ", '" + value + "', [" + to_string(pos.line) + ", " + to_string(pos.col) + "])";
+}
 
-		bool Token::isLiteral() {
-			return NULL_LITERAL == type || NUMBER == type || STRING == type || TRUE == type || FALSE == type;
-		}
+bool Token::isLiteral() {
+	return NULL_LITERAL == type || NUMBER == type || STRING == type || TRUE == type || FALSE == type;
+}
 
-		bool Token::isValid() {
-			return INVALID != type;
-		}
+bool Token::isValid() {
+	return INVALID != type;
+}

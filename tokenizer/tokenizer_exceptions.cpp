@@ -14,14 +14,20 @@ string to_string(TokenizerExceptionType t) {
 }
 
 TokenizerException::TokenizerException (const string& msg) : message(msg) {};
-TokenizerException::TokenizerException (const TokenizerExceptionType & ntype) : type(ntype) {};
-TokenizerException::TokenizerException (const TokenizerExceptionType & ntype, const string& msg) : type(ntype), message(msg) {};
 
-		string TokenizerException::getMessage() const { return message; }
-		TokenizerExceptionType TokenizerException::getType() const { return type; }
-		string TokenizerException::toString() const {
-			return "Tokenizer Exception (" + to_string(type) + "): " + message;
-		}
-		const char* TokenizerException::what() const noexcept {
-			return message.c_str();
-		}
+TokenizerException::TokenizerException (const TokenizerExceptionType & ntype) : type(ntype) {};
+
+TokenizerException::TokenizerException (const TokenizerExceptionType & ntype, const string& msg) :
+	type(ntype), message(msg) {};
+
+string TokenizerException::getMessage() const { return message; }
+
+TokenizerExceptionType TokenizerException::getType() const { return type; }
+
+string TokenizerException::toString() const {
+	return "Tokenizer Exception (" + to_string(type) + "): " + message;
+}
+
+const char* TokenizerException::what() const noexcept {
+	return message.c_str();
+}

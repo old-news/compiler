@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../tokenizer/token.h"
 #include "node.h"
 
@@ -90,50 +88,53 @@ string toString(NodeType type) {
 }
 
 Node::Node(NodeType t) : type(t) {};
+
 Node::Node(Token t) : type(TOKEN), token(t) {};
+
 Node::Node(NodeType type, Token tok) : type(type), token(tok) {};
+
 Node::Node(NodeType type, unique_ptr<Node> uniq) {
-		type = type;
-		children = std::move(uniq->children);
-	}
+	type = type;
+	children = std::move(uniq->children);
+}
 
-	void Node::add(unique_ptr<Node> child) {
-		children.push_back(std::move(child));
-	}
+void Node::add(unique_ptr<Node> child) {
+	children.push_back(std::move(child));
+}
 
-	void Node::add(NodeType ntype, unique_ptr<Node> child) {
-		child->type = ntype;
-		children.push_back(std::move(child));
-	}
+void Node::add(NodeType ntype, unique_ptr<Node> child) {
+	child->type = ntype;
+	children.push_back(std::move(child));
+}
 
-	void Node::add(Token tchild) {
-		add(make_unique<Node>(tchild));
-	}
+void Node::add(Token tchild) {
+	add(make_unique<Node>(tchild));
+}
 
-	void Node::add(NodeType ntype, Token tchild) {
-		add(make_unique<Node>(ntype, tchild));
-	}
+void Node::add(NodeType ntype, Token tchild) {
+	add(make_unique<Node>(ntype, tchild));
+}
 
-	void Node::print() {
-		cout << "DEPTH │ TREE" << endl << "──────┼─────" << endl;
-		print(0);
-	}
+void Node::print() {
+	cout << "DEPTH │ TREE" << endl << "──────┼─────" << endl;
+	print(0);
+}
 
-	unique_ptr<Node> Node::last() {
-		return std::move(children.back());
-	}
+unique_ptr<Node> Node::last() {
+	return std::move(children.back());
+}
 
-	void Node::print(int depth) {
-		string s = to_string(depth);
-		if (s.size() < 5) {
-			s.insert(0, 5 - s.size(), ' ');
-		}
-		cout << s << " │ ";
-		for (int j = 0; j < depth; j++) {
-			cout << ((INVALID == token.getType()) ? "\t" : "--------");
-		}
-		cout << ((INVALID == token.getType()) ? toString(type) : " " + token.getValue()) << endl;
-		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->print(depth + 1);
-		}
+void Node::print(int depth) {
+	string s = to_string(depth);
+	if (s.size() < 5) {
+		s.insert(0, 5 - s.size(), ' ');
 	}
+	cout << s << " │ ";
+	for (int j = 0; j < depth; j++) {
+		cout << ((INVALID == token.getType()) ? "\t" : "--------");
+	}
+	cout << ((INVALID == token.getType()) ? toString(type) : " " + token.getValue()) << endl;
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->print(depth + 1);
+	}
+}
