@@ -93,14 +93,11 @@ NodePtr Parser::tryParseStar(function<NodePtr()> branch) {
 }
 
 NodePtr Parser::list(function<NodePtr()> variable) {
-	NodePtr c = variable();
 	NodePtr n = tryParseStar(variable);
-	NodePtr parent = make_unique<Node>(LIST);
-	parent->add(std::move(c));
-	for (size_t i = 0; i < n->children.size(); i++) {
-		parent->add(std::move(n->children[i]));
+	if (n->children.empty()) {
+		variable();
 	}
-	return parent;
+	return n;
 }
 
 NodePtr Parser::list(function<NodePtr()> variable, TokenType delim) {
@@ -166,12 +163,16 @@ NodePtr Parser::type() {
 				n->add(match(AT_SYMBOL));
 				break;
 			case OPEN_BRACKET: {
-				match(OPEN_BRACKET);
+				n->add(match(OPEN_BRACKET));
+				if (CLOSE_BRACKET == currtype()) {
+					n->add(match(CLOSE_BRACKET));
+					break;
+				}
 				NodePtr c = tryParse([this] {return expression();});
 				if (!c) {
 					c = type();
 				}
-				match(CLOSE_BRACKET);
+				n->add(match(CLOSE_BRACKET));
 				n->add(std::move(c));
 				break;
 			}

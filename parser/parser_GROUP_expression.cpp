@@ -1,15 +1,22 @@
+#include "node.h"
 #include "parser.h"
 #include <memory>
 
 NodePtr Parser::expression() {
 	NodePtr n = make_unique<Node>(EXPRESSION);
-	NodePtr c = tryParse([this] {return ternary_operator();});
-	if (c) {
-		n->add(std::move(c));
+	NodePtr c = e0();
+	if (QUESTION_MARK == currtype()) {
+		// Handling the ternary operator in here makes parsing much more efficient
+		NodePtr q = make_unique<Node>(TERNARY_OPERATOR);
+		q->add(CONDITION, std::move(c));
+		match(QUESTION_MARK);
+		q->add(LVALUE, expression());
+		match(COLON);
+		q->add(RVALUE, expression());
+		n->add(std::move(q));
 		return n;
-	} else {
-		n->add(Parser::e0());
 	}
+	n->add(std::move(c));
 	return n;
 }
 
@@ -187,12 +194,11 @@ NodePtr Parser::e7() {
 
 NodePtr Parser::e8() {
 	NodePtr n = make_unique<Node>(E8);
-	NodePtr c = tryParse([this] {return literal();});
-	if (c) {
-		n->add(std::move(c));
-		return n;
+	if (curr().isLiteral()) {
+		n->add(literal());
+	} else {
+		n->add(vvalue());
 	}
-	n->add(vvalue());
 	return n;
 }
 

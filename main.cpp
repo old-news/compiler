@@ -58,11 +58,14 @@ int main(int argc, char** argv) {
 	string stdlib_code = "";	// read_file("stdlib.bv");
 	string input_code = source_code;	// stdlib_code + '\n' + source_code;
 	vector<Token> tokens = Tokenizer(input_code).tokenize();
-	for (auto t : tokens) {
-		cout << t.toString() << endl;
-	}
+	cout << "Num tokens: " << tokens.size() << endl;
+	/*
+	 * for (auto t : tokens) {
+		 * cout << t.toString() << endl;
+	 * }
+	 */
 	NodePtr parsed = Parser(tokens).parse();
-	parsed->print();
+	// parsed->print();
 	/*
 	 * vector<exception> errors = Validator(parsed).validate();
 	 * if (!errors.empty()) {

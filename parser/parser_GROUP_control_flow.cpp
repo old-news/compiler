@@ -55,12 +55,12 @@ NodePtr Parser::if_block() {
 	n->add(BODY, compound_block());
 	exit_scope();
 	NodePtr c;
-	while ((c = tryParse([this] {return elif_block();}))) {
+	while (ELIF == currtype()) {
+		c = elif_block();
 		n->add(std::move(c));
 	}
-	c = tryParse([this] {return else_block();});
-	if (c) {
-		n->add(std::move(c));
+	if (ELSE == currtype()) {
+		n->add(else_block());
 	}
 	return n;
 }

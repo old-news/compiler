@@ -17,15 +17,25 @@ NodePtr Parser::class_definition() {
 
 NodePtr Parser::class_def_body() {
 	NodePtr n = make_unique<Node>(BODY);
-	NodePtr c = tryParse([this] {return class_var_section();});
-	if (c) {
-		n->add(std::move(c));
-		n->add(class_func_section());
-	} else {
+	if (OPEN_PARENTHESIS == peek(1).getType()) {
 		n->add(class_func_section());
 		n->add(class_var_section());
+	} else {
+		n->add(class_var_section());
+		n->add(class_func_section());
 	}
 	return n;
+	/*
+	 * NodePtr c = tryParse([this] {return class_var_section();});
+	 * if (c) {
+		 * n->add(std::move(c));
+		 * n->add(class_func_section());
+	 * } else {
+		 * n->add(class_func_section());
+		 * n->add(class_var_section());
+	 * }
+	 * return n;
+	 */
 }
 
 NodePtr Parser::class_func_section() {
@@ -47,7 +57,8 @@ NodePtr Parser::class_var_section() {
 	n->add(var_decl(true));
 	loc_end();
 	NodePtr c;
-	while ((c = tryParse([this] {return var_decl(true);}))) {
+	while (OPEN_PARENTHESIS != peek(1).getType()) {
+		c = var_decl(true);
 		n->add(std::move(c));
 		loc_end();
 	}
