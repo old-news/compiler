@@ -32,6 +32,7 @@ class Parser {
 		void enter_scope();
 		void exit_scope();
 		void loc_end();
+		bool atLoc_end();
 		NodePtr type();
 
 		NodePtr program();
@@ -62,7 +63,6 @@ class Parser {
 		NodePtr function_call();
 
 		NodePtr function_definition();
-		NodePtr function_definition(bool);
 		NodePtr var_ldecl();
 
 		NodePtr enum_definition();

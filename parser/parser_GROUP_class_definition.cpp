@@ -29,7 +29,7 @@ NodePtr Parser::class_def_body() {
 }
 
 NodePtr Parser::class_func_section() {
-	NodePtr n = list([this] {return function_definition(true);});
+	NodePtr n = list([this] {return function_definition();});
 	n->type = CLASS_FUNC_SECTION;
 	return n;
 }

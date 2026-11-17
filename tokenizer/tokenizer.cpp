@@ -27,7 +27,8 @@ void Tokenizer::init_keywords() {
 		{"break", BREAK}, {"continue", CONTINUE},
 		{"throw", THROW}, {"try", TRY}, {"except", EXCEPT}, {"finally", FINALLY},
 		{"import", IMPORT}, {"from", FROM}, {"as", AS},
-		{"const", CONST}, {"int", INT}, {"float", FLOAT}, {"char", CHAR}, {"str", STRING_TYPE}, {"bool", BOOL},
+		{"const", CONST},
+		// {"int", INT}, {"float", FLOAT}, {"char", CHAR}, {"str", STRING_TYPE}, {"bool", BOOL},
 		{"return", RETURN}, {"enum", ENUM},
 		{"class", CLASS}, {"private", PRIVATE}, {"protected", PROTECTED}, {"public", PUBLIC},
 		{"childof", CHILDOF}, {"template", TEMPLATE}, {"adheresto", ADHERESTO},
@@ -206,7 +207,7 @@ void Tokenizer::tokenize_next() {
 			// NUMBER
 			size_t seek = 1;
 			char sook = next(seek);
-			while (sook >= '0' && sook <= '9') {
+			while ((sook >= '0' && sook <= '9') || '.' == sook) {
 				seek++;
 				sook = next(seek);
 			}

@@ -67,15 +67,18 @@ NodePtr Parser::var_decl(bool is_class_var) {
 	n->add(NAME, match(ID));
 	if (ASSIGN_TYPED == currtype() && !is_class_var) {
 		n->add(match(ASSIGN_TYPED));
+		n->add(expression());
 	} else {
 		match(COLON);
-		n->add(type());
 		if (is_class_var) {
 			n->add(class_access_level());
 		}
-		n->add(match(ASSIGN));
+		n->add(type());
+		if (ASSIGN == currtype()) {
+			n->add(match(ASSIGN));
+			n->add(expression());
+		}
 	}
-	n->add(expression());
 	return n;
 }
 
@@ -90,7 +93,14 @@ NodePtr Parser::var_forward_decl() {
 NodePtr Parser::var_assignment() {
 	NodePtr n = make_unique<Node>(VAR_ASSIGNMENT);
 	n->add(LVALUE, vvalue());
-	match(ASSIGN);
+	TokenType t = currtype();
+	switch (t) {
+		case ASSIGN: case ASSIGN_PLUS: case ASSIGN_MINUS: case ASSIGN_STAR: case ASSIGN_SLASH: case ASSIGN_POWER: case ASSIGN_MODULO: case ASSIGN_OR: case ASSIGN_XOR: case ASSIGN_AND: case ASSIGN_SHIFT_LEFT: case ASSIGN_SHIFT_RIGHT:
+			match(t);
+			break;
+		default:
+			throw ParserException(UNEXPECTED_TOKEN, "Expected an assignment or modified assignment operator", getpos());
+	}
 	n->add(RVALUE, expression());
 	return n;
 }

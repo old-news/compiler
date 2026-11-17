@@ -2,10 +2,6 @@
 #include <memory>
 
 NodePtr Parser::function_definition() {
-	return function_definition(false);
-}
-
-NodePtr Parser::function_definition(bool is_class_function) {
 	NodePtr n = make_unique<Node>(FUNCTION_DEFINITION);
 	n->add(NAME, match(ID));
 	match(OPEN_PARENTHESIS);
@@ -16,11 +12,9 @@ NodePtr Parser::function_definition(bool is_class_function) {
 		);
 	}
 	match(CLOSE_PARENTHESIS);
-	match(COLON);
-	if (is_class_function) {
-		n->add(class_access_level());
+	if (!tryMatch(COLON).is(INVALID)) {
+		n->add(type());
 	}
-	n->add(type());
 	enter_scope();
 	n->add(BODY, compound_block());
 	exit_scope();

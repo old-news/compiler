@@ -1,4 +1,6 @@
+#include "node.h"
 #include "parser.h"
+#include "parser_exception.h"
 #include <memory>
 
 Parser::Parser(const vector<Token>& i) : input(i), pos(0) {};
@@ -46,7 +48,11 @@ Token Parser::match(TokenType type) {
 		}
 		return c;
 	}
-	throw ParserException(UNEXPECTED_TOKEN, "Failed token match", getpos());
+	throw ParserException(
+		UNEXPECTED_TOKEN,
+		"Failed token match of '" + to_string(type) + "'",
+		getpos()
+	);
 }
 
 Token Parser::tryMatch(TokenType type) {
@@ -134,14 +140,26 @@ void Parser::loc_end() {
 	}
 }
 
+bool Parser::atLoc_end() {
+	return SEMICOLON == currtype() || NEWLINE == unpeek(1).getType();
+}
+
 NodePtr Parser::type() {
 	NodePtr n = make_unique<Node>(TYPE);
+	NodePtr c = tryParse([this] {return class_access_level();});
+	if (c) {
+		n->add(std::move(c));
+	}
 	if (CONST == currtype()) {
 		n->add(match(CONST));
 	}
-	TokenType t;
+	TokenType t = currtype();
+	if (OPEN_CURLY == t && 0 != n->children.size() && CLASS_ACCESS == n->children[0]->type) {
+		// Class function with no return type
+		return n;
+	}
 	bool lastWasClass;
-	while (CLOSE_PARENTHESIS != (t = currtype()) && OPEN_CURLY != t && ASSIGN != t && NEWLINE != t && SEMICOLON != t) {
+	do {
 		lastWasClass = false;
 		switch (t) {
 			case AT_SYMBOL:
@@ -168,7 +186,11 @@ NodePtr Parser::type() {
 			default:
 				throw ParserException(UNEXPECTED_TOKEN, "Expected type", getpos());
 		}
-	}
+		if (atLoc_end()) {
+			break;
+		}
+		t = currtype();
+	} while (CLOSE_PARENTHESIS != t && OPEN_CURLY != t && ASSIGN != t);
 	if (!lastWasClass) {
 		throw ParserException(UNEXPECTED_TOKEN, "Expected previous token to be a class", getpos());
 	}
