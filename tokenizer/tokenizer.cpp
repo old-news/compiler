@@ -287,7 +287,7 @@ bool Tokenizer::iswspace(char c) {
 }
 
 bool Tokenizer::isidchar(char c) {
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_') || (c >= '0' && c <= 9);
 }
 
 void Tokenizer::handle_newline_indentation() {
