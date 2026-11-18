@@ -11,7 +11,7 @@ using namespace std;
 
 class Parser {
 	private:
-		vector<Token> input;
+		const vector<Token>& input;
 		size_t pos;
 		Pos filepos;
 

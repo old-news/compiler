@@ -58,7 +58,7 @@ NodePtr Parser::class_var_section() {
 	loc_end();
 	NodePtr c;
 	while (OPEN_PARENTHESIS != peek(1).getType()) {
-		c = var_decl(true);
+		c = var_decl();
 		n->add(std::move(c));
 		loc_end();
 	}

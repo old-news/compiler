@@ -48,17 +48,24 @@ NodePtr Parser::block() {
 		case CLOSE_CURLY:
 			return n;
 		default:
-			NodePtr c = tryParse([this] {return loc();});
-			if (c) {
-				n->add(std::move(c));
-				break;
+			if (COLON == peek(3).getType() && OPEN_PARENTHESIS == peek(1).getType()) {
+				n->add(function_definition());
+			} else {
+				n->add(loc());
 			}
-			c = tryParse([this] {return function_definition();});
-			if (c) {
-				n->add(std::move(c));
-				break;
-			}
-			throw ParserException(UNEXPECTED_TOKEN, "Expected something to be here", getpos());
+			/*
+			 * NodePtr c = tryParse([this] {return loc();});
+			 * if (c) {
+				 * n->add(std::move(c));
+				 * break;
+			 * }
+			 * c = tryParse([this] {return function_definition();});
+			 * if (c) {
+				 * n->add(std::move(c));
+				 * break;
+			 * }
+			 * throw ParserException(UNEXPECTED_TOKEN, "Expected something to be here", getpos());
+	 		 */
 	}
 	return n;
 }

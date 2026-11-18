@@ -55,27 +55,25 @@ NodePtr Parser::throw_statement() {
 }
 
 NodePtr Parser::var_decl() {
-	return var_decl(false);
-}
-
-NodePtr Parser::var_decl(bool is_class_var) {
 	NodePtr n = make_unique<Node>(VAR_DECL);
 	if (COMMA == peek(1).getType()) {
 		n = var_forward_decl();
 		return n;
 	}
 	n->add(NAME, match(ID));
-	if (ASSIGN_TYPED == currtype() && !is_class_var) {
+	if (ASSIGN_TYPED == currtype()) {
 		n->add(match(ASSIGN_TYPED));
 		n->add(expression());
 	} else {
 		match(COLON);
-		if (is_class_var) {
-			n->add(class_access_level());
+		NodePtr c = tryParse([this] {return class_access_level();});
+		if (c) {
+			n->add(std::move(c));
 		}
 		n->add(type());
-		if (ASSIGN == currtype()) {
-			n->add(match(ASSIGN));
+		TokenType t = currtype();
+		if (ASSIGN == t || ASSIGN_TYPED == t) {
+			n->add(match(t));
 			n->add(expression());
 		}
 	}

@@ -34,6 +34,9 @@ unordered_map<FLAG, string> parse_flags(int argc, char** argv) {
 	if (map.find(OUTPUT_NAME) == map.end()) {
 		map.emplace(OUTPUT_NAME, "a.out");
 	}
+	if (map.find(INPUT_NAME) == map.end()) {
+		throw runtime_error("No file selected for compilation");
+	}
 	return map;
 }
 
@@ -54,10 +57,9 @@ void write_file(string filename, string output) {
 
 int main(int argc, char** argv) {
 	unordered_map<FLAG, string> flags = parse_flags(argc, argv);
-	string source_code = read_file(flags.at(INPUT_NAME));
 	string stdlib_code = "";	// read_file("stdlib.bv");
-	string input_code = source_code;	// stdlib_code + '\n' + source_code;
-	vector<Token> tokens = Tokenizer(input_code).tokenize();
+	string input_code = read_file(flags.at(INPUT_NAME)) + "\n" + stdlib_code;
+	const vector<Token>& tokens = Tokenizer(input_code).tokenize();
 	cout << "Num tokens: " << tokens.size() << endl;
 	/*
 	 * for (auto t : tokens) {
@@ -81,4 +83,5 @@ int main(int argc, char** argv) {
 	// string assembly = Objectifier(optimized).objectify();
 	// vector<uint8_t> assembled = Assembler(assembly).assemble();
 	// write_file("a.out", assembled);
+	return 0;
 }
