@@ -40,3 +40,24 @@ unordered_set<Location> SymbolTable::getEnum(string name) {
 unordered_set<Location> SymbolTable::getVar(string name) {
 	return variables[name];
 }
+
+string to_str(unordered_map<string, unordered_set<Location>> table) {
+	string s = "";
+	for (auto v : table) {
+		s += v.first + "{\n";
+		for (auto l : v.second) {
+			s += "  " + l.toString() + "\n";
+		}
+		s += "}\n";
+	}
+	s += "\n";
+	return s;
+}
+
+string SymbolTable::toString() {
+	string f = "FUNCTIONS:\n" + to_str(functions);
+	string c = "CLASSES:\n" + to_str(classes);
+	string e = "ENUMS:\n" + to_str(enums);
+	string v = "VARIABLES:\n" + to_str(variables);
+	return f + c + e + v;
+}

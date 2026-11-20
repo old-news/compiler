@@ -54,7 +54,7 @@ NodePtr Parser::class_access_level() {
 
 NodePtr Parser::class_var_section() {
 	NodePtr n = make_unique<Node>(CLASS_VAR_SECTION);
-	n->add(var_decl(true));
+	n->add(var_decl());
 	loc_end();
 	NodePtr c;
 	while (OPEN_PARENTHESIS != peek(1).getType()) {

@@ -98,7 +98,6 @@ class Parser {
 		NodePtr control_flow_interruption();
 		NodePtr throw_statement();
 		NodePtr var_decl();
-		NodePtr var_decl(bool);
 		NodePtr var_forward_decl();
 		NodePtr var_assignment();
 	public:

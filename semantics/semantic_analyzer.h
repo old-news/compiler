@@ -9,4 +9,5 @@ class SemanticAnalyzer {
 		SemanticAnalyzer(NodePtr);
 
 		SymbolTable analyze();
+		void analyze_rec(NodePtr node, Location loc);
 };

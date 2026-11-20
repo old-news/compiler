@@ -82,7 +82,7 @@ NodePtr Parser::var_decl() {
 
 NodePtr Parser::var_forward_decl() {
 	NodePtr n = make_unique<Node>(VAR_FORWARD_DECL);
-	n->add(list([this] {return make_unique<Node>(match(ID));}, COMMA));
+	n->add(list([this] {return make_unique<Node>(NAME, match(ID));}, COMMA));
 	match(COLON);
 	n->add(type());
 	return n;

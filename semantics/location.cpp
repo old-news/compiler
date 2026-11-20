@@ -1,5 +1,4 @@
 #include "location.h"
-#include <algorithm>
 
 Location::Location() {
 	path = {};
@@ -28,4 +27,26 @@ bool Location::is_in(const Location& other) {
 
 vector<size_t> Location::getPath() const {
 	return path;
+}
+
+void Location::push(size_t i) {
+	path.push_back(i);
+}
+
+void Location::set_back(size_t i) {
+	path[path.size() - 1] = i;
+}
+
+string Location::toString() {
+	if (path.empty()) {
+		return "<top level>";
+	}
+	string s = "";
+	for (int i = 0; i < path.size(); i++) {
+		s += to_string(path[i]);
+		if (i+1 < path.size()) {
+			s += ".";
+		}
+	}
+	return s;
 }

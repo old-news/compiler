@@ -191,7 +191,7 @@ NodePtr Parser::type() {
 			break;
 		}
 		t = currtype();
-	} while (CLOSE_PARENTHESIS != t && OPEN_CURLY != t && ASSIGN != t);
+	} while (CLOSE_PARENTHESIS != t && OPEN_CURLY != t && ASSIGN != t && COMMA != t);
 	if (!lastWasClass) {
 		throw ParserException(UNEXPECTED_TOKEN, "Expected previous token to be a class", getpos());
 	}

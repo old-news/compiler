@@ -1,5 +1,6 @@
 #include "tokenizer/tokenizer.h"
 #include "parser/parser.h"
+#include "semantics/semantic_analyzer.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -67,7 +68,7 @@ int main(int argc, char** argv) {
 	 * }
 	 */
 	NodePtr parsed = Parser(tokens).parse();
-	// parsed->print();
+	parsed->print();
 	/*
 	 * vector<exception> errors = Validator(parsed).validate();
 	 * if (!errors.empty()) {
@@ -77,7 +78,8 @@ int main(int argc, char** argv) {
 		 * return -1;
 	 * }
 	 */
-	// Semantic sma = SemanticAnalyzer(parsed).analyze();
+	SymbolTable sma = SemanticAnalyzer(std::move(parsed)).analyze();
+	cout << sma.toString() << endl;
 	// IR ir = InternalRepresentation(sma).generate();
 	// IR optimized = Optimizer(ir).optimize();
 	// string assembly = Objectifier(optimized).objectify();

@@ -26,4 +26,6 @@ class SymbolTable {
 		unordered_set<Location> getClass(string name);
 		unordered_set<Location> getEnum(string name);
 		unordered_set<Location> getVar(string name);
+
+		string toString();
 };

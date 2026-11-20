@@ -49,6 +49,9 @@ struct Node {
 	void print();
 	unique_ptr<Node> last();
 	void print(int depth);
+	string gettValue();
+	string getName();
+	unique_ptr<Node>* find(NodeType);
 };
 
 using NodePtr = unique_ptr<Node>;

@@ -138,3 +138,25 @@ void Node::print(int depth) {
 		children[i]->print(depth + 1);
 	}
 }
+
+string Node::gettValue() {
+	return token.getValue();
+}
+
+string Node::getName() {
+	NodePtr* n = find(NAME);
+	if (nullptr == n) {
+		return "";
+	}
+	return (*n)->gettValue();
+}
+
+NodePtr* Node::find(NodeType t) {
+	for (int i = 0; i < children.size(); i++) {
+		NodePtr& c = children[i];
+		if (t == c->type) {
+			return &c;
+		}
+	}
+	return nullptr;
+}

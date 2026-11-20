@@ -14,6 +14,9 @@ class Location {
 		bool operator==(const Location&) const;
 		bool is_in(const Location&);
 		vector<size_t> getPath() const;
+		void push(size_t);
+		void set_back(size_t);
+		string toString();
 };
 
 template <>
