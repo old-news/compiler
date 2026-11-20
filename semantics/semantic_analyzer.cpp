@@ -30,8 +30,10 @@ void SemanticAnalyzer::analyze_rec(NodePtr node, Location loc) {
 				st.addVar((*node->find(LIST))->children[i]->gettValue(), loc);
 			}
 			break;
-		case IMPORTEE:
-			// Add stuff here
+		case IMPORT_LINE:
+			NodePtr* thing = node->find(IMPORTEE);
+			string name = (*thing)->concatChildren();
+			st.addPackage(name);
 			break;
 	}
 	if (hasBlockChildren) {

@@ -87,7 +87,7 @@ string toString(NodeType type) {
 	return "UNKNOWN";
 }
 
-Node::Node(NodeType t) : type(t) {};
+Node::Node(NodeType t) : type(t), token({}) {};
 
 Node::Node(Token t) : type(TOKEN), token(t) {};
 
@@ -96,6 +96,7 @@ Node::Node(NodeType type, Token tok) : type(type), token(tok) {};
 Node::Node(NodeType type, unique_ptr<Node> uniq) {
 	type = type;
 	children = std::move(uniq->children);
+	token = {};
 }
 
 void Node::add(unique_ptr<Node> child) {
@@ -159,4 +160,12 @@ NodePtr* Node::find(NodeType t) {
 		}
 	}
 	return nullptr;
+}
+
+string Node::concatChildren() {
+	string s = "";
+	for (int i = 0; i < children.size(); i++ ){ 
+		s += children[i]->gettValue();
+	}
+	return s;
 }

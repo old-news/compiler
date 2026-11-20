@@ -25,6 +25,10 @@ void SymbolTable::addVar(string name, Location l) {
 	variables[name].emplace(l);
 }
 
+void SymbolTable::addPackage(string name) {
+	packages.insert(name);
+}
+
 unordered_set<Location> SymbolTable::getFunc(string name) {
 	return functions[name];
 }

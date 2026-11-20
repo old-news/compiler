@@ -52,6 +52,7 @@ struct Node {
 	string gettValue();
 	string getName();
 	unique_ptr<Node>* find(NodeType);
+	string concatChildren();
 };
 
 using NodePtr = unique_ptr<Node>;

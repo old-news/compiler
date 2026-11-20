@@ -21,6 +21,7 @@ class SymbolTable {
 		void addFunc(string name, Location l);
 		void addClass(string name, Location l);
 		void addEnum(string name, Location l);
+		void addPackage(string name);
 
 		unordered_set<Location> getFunc(string name);
 		unordered_set<Location> getClass(string name);
