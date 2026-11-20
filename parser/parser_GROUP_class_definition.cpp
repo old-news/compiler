@@ -16,7 +16,7 @@ NodePtr Parser::class_definition() {
 }
 
 NodePtr Parser::class_def_body() {
-	NodePtr n = make_unique<Node>(BODY);
+	NodePtr n = make_unique<Node>(CLASS_DEF_BODY);
 	if (OPEN_PARENTHESIS == peek(1).getType()) {
 		n->add(class_func_section());
 		n->add(class_var_section());
